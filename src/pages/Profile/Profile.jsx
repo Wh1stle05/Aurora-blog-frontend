@@ -262,12 +262,12 @@ export default function Profile({ user, onUserUpdate }) {
       <Modal
         open={showNicknameModal}
         onClose={() => setShowNicknameModal(false)}
-        contentClassName={`glass blur ${styles.modal}`}
+        contentClassName={`modal-content ${styles.modal}`}
         contentVariants={modalVariants}
       >
         <div className={styles.modalHeader}>
           <h3>修改昵称</h3>
-          <button className={styles.closeBtn} onClick={() => setShowNicknameModal(false)}>&times;</button>
+          <button className="modal-close" onClick={() => setShowNicknameModal(false)}>&times;</button>
         </div>
         <div className={styles.modalBody}>
           <p className={styles.warningText}>提示：昵称每周只能修改一次，请谨慎操作。</p>
@@ -293,12 +293,12 @@ export default function Profile({ user, onUserUpdate }) {
       <Modal
         open={showEmailModal}
         onClose={() => setShowEmailModal(false)}
-        contentClassName={`glass blur ${styles.modal}`}
+        contentClassName={`modal-content ${styles.modal}`}
         contentVariants={modalVariants}
       >
         <div className={styles.modalHeader}>
           <h3>更换绑定邮箱</h3>
-          <button className={styles.closeBtn} onClick={() => setShowEmailModal(false)}>&times;</button>
+          <button className="modal-close" onClick={() => setShowEmailModal(false)}>&times;</button>
         </div>
         <div className={styles.modalBody}>
           <div className={styles.inputGroup}>
@@ -341,7 +341,7 @@ export default function Profile({ user, onUserUpdate }) {
       <Modal
         open={showCropModal}
         onClose={() => setShowCropModal(false)}
-        contentClassName={`glass blur ${styles.cropModal}`}
+        contentClassName={`modal-content ${styles.cropModal}`}
         contentVariants={modalVariants}
         closeOnOverlay={false}
       >

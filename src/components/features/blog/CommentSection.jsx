@@ -13,6 +13,7 @@ const CommentItem = ({ comment, depth = 0, onReply, onReact, onDelete, currentUs
   // 一条评论，只要他的回复评论超过三条就全部折叠
   const shouldFoldChildren = comment.children && comment.children.length > 3;
   const hasChildren = comment.children && comment.children.length > 0;
+  const childrenVisible = !shouldFoldChildren || isExpanded;
   
   const handleReplySubmit = async (e) => {
     e.preventDefault();
@@ -34,7 +35,8 @@ const CommentItem = ({ comment, depth = 0, onReply, onReact, onDelete, currentUs
   const isAuthor = currentUser && currentUser.id === comment.author.id;
   const isHidden = comment.is_visible === 0;
   const isDeleted = comment.is_visible === -1;
-  const shouldHideAll = isHidden || isDeleted;
+  const shouldDisableActions = isHidden || isDeleted;
+  const shouldHideChildren = isDeleted;
 
   return (
     <div className={`${styles.commentItem} ${depth > 0 ? styles.replyItem : ''} ${isHidden ? styles.hiddenComment : isDeleted ? styles.deletedComment : ''}`}>
@@ -51,7 +53,7 @@ const CommentItem = ({ comment, depth = 0, onReply, onReact, onDelete, currentUs
       <div className={styles.commentActions}>
         <button 
           type="button"
-          disabled={shouldHideAll}
+          disabled={shouldDisableActions}
           onClick={() => handleReactClick(1)} 
           className={`${styles.actionBtn} ${comment.user_reaction === 1 ? styles.actionBtnActiveLike : ''}`}
         >
@@ -59,13 +61,13 @@ const CommentItem = ({ comment, depth = 0, onReply, onReact, onDelete, currentUs
         </button>
         <button 
           type="button"
-          disabled={shouldHideAll}
+          disabled={shouldDisableActions}
           onClick={() => handleReactClick(-1)} 
           className={`${styles.actionBtn} ${comment.user_reaction === -1 ? styles.actionBtnActiveDislike : ''}`}
         >
           <FaThumbsDown size={14} /> <span>{comment.dislike_count || 0}</span>
         </button>
-        <button type="button" onClick={() => setShowReplyForm(!showReplyForm)} className={styles.actionBtn} disabled={shouldHideAll}>
+        <button type="button" onClick={() => setShowReplyForm(!showReplyForm)} className={styles.actionBtn} disabled={shouldDisableActions}>
           <FaReply size={14} /> <span>回复</span>
         </button>
         {isAuthor && comment.is_visible === 1 && (
@@ -93,7 +95,7 @@ const CommentItem = ({ comment, depth = 0, onReply, onReact, onDelete, currentUs
         </form>
       )}
 
-      {hasChildren && shouldFoldChildren && !isExpanded && !shouldHideAll && (
+      {hasChildren && shouldFoldChildren && !isExpanded && !shouldHideChildren && (
         <div className={styles.expandToggle}>
           <button type="button" onClick={() => setIsExpanded(true)} className={styles.expandBtn}>
             展开 {comment.children.length} 条回复
@@ -101,7 +103,7 @@ const CommentItem = ({ comment, depth = 0, onReply, onReact, onDelete, currentUs
         </div>
       )}
 
-      {hasChildren && childrenVisible && !shouldHideAll && (
+      {hasChildren && childrenVisible && !shouldHideChildren && (
         <div className={styles.childrenContainer}>
           {comment.children.map(child => (
             <CommentItem 
