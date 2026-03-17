@@ -11,6 +11,7 @@ const BACKEND_HOST = API_BASE_URL.replace(/\/api$/, '');
 const Header = ({ theme, onToggleTheme, onLoginClick, user, onLogout, onUserUpdate }) => {
   const [hidden, setHidden] = useState(false);
   const toast = useToast();
+  const location = useLocation();
   const { scrollY, scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -19,6 +20,13 @@ const Header = ({ theme, onToggleTheme, onLoginClick, user, onLogout, onUserUpda
   });
   const lastY = useRef(0);
   const [isLogoHovered, setIsLogoHovered] = useState(false);
+
+  useEffect(() => {
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
+    }
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const diff = latest - lastY.current;

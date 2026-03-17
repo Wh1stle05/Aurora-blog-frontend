@@ -43,10 +43,28 @@ const StatCard = ({ icon: Icon, label, value, delay }) => (
   </motion.div>
 );
 
+const titleVariants = {
+  hidden: { opacity: 0, y: 30, filter: "blur(10px)" },
+  show: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 1, ease: "easeOut" }
+  }
+};
+
+const buttonVariants = {
+  hidden: { opacity: 0 },
+  showLeft: { opacity: 1, transition: { duration: 0.5, delay: 0 } },
+  showRight: { opacity: 1, transition: { duration: 0.5, delay: 0.4 } }
+};
+
 function Home() {
   const [latestPosts, setLatestPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [postsError, setPostsError] = useState(false);
   const [stats, setStats] = useState({ posts: 0, views: 0, comments: 0, likes: 0 });
+  const [heroReady, setHeroReady] = useState(false);
 
   useEffect(() => {
     getPosts(1, 3)
@@ -55,7 +73,10 @@ function Home() {
           setLatestPosts(res.data);
         }
       })
-      .catch(err => console.error('获取最新文章失败:', err));
+      .catch(err => {
+        console.error('获取最新文章失败:', err);
+        setPostsError(true);
+      });
 
     getStats()
       .then(res => {
@@ -67,41 +88,64 @@ function Home() {
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    if (!loading) {
+      const id = window.setTimeout(() => setHeroReady(true), 1000);
+      return () => window.clearTimeout(id);
+    }
+  }, [loading]);
+
+  const postsState = postsError ? "error" : (loading ? "loading" : "ready");
+
   return (
     <PageWrapper>
       <Body>
         {/* 第一屏：Hero Section */}
         <div className={styles.heroSection}>
           <div className={styles.heroCenterer}>
-            <motion.div 
-              initial={{ opacity: 0, y: 30, filter: 'blur(10px)' }}
-              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              transition={{ duration: 1, ease: "easeOut" }}
-              className={styles.heroContent}
-            >
-              <div className={styles.heroBadge}>
-                <span className={styles.pulse}></span>
-                Explore the edge of code
-              </div>
-              <h1 className={styles.heroTitle}>
-                欢迎来到 <span className={styles.accentText}>Aurora</span> 空间
-              </h1>
-              <p className={styles.heroSubtitle}>
-                
-              </p>
+            <div className={styles.heroContent}>
+              <motion.div
+                className={styles.heroText}
+                variants={titleVariants}
+                initial="hidden"
+                animate="show"
+              >
+                <div className={styles.heroBadge}>
+                  <span className={styles.pulse}></span>
+                  Explore the edge of code
+                </div>
+                <h1 className={styles.heroTitle}>
+                  欢迎来到 <span className={styles.accentText}>Aurora</span> 空间
+                </h1>
+                <p className={styles.heroSubtitle}>
+                  
+                </p>
+              </motion.div>
               <div className={styles.heroActions}>
-                <Link to="/blog">
-                  <button className={styles.primaryButton}>
-                    开始阅读
-                  </button>
-                </Link>
-                <Link to="/about">
-                  <button className={styles.secondaryButton}>
-                    关于作者
-                  </button>
-                </Link>
+                <motion.div
+                  variants={buttonVariants}
+                  initial="hidden"
+                  animate={heroReady ? "showLeft" : "hidden"}
+                >
+                  <Link to="/blog">
+                    <button className={`${styles.heroButton} ${styles.primary}`}>
+                      开始阅读
+                    </button>
+                  </Link>
+                </motion.div>
+                <motion.div
+                  variants={buttonVariants}
+                  initial="hidden"
+                  animate={heroReady ? "showRight" : "hidden"}
+                >
+                  <Link to="/about">
+                    <button className={`${styles.heroButton} ${styles.secondary}`}>
+                      关于作者
+                    </button>
+                  </Link>
+                </motion.div>
               </div>
-            </motion.div>
+            </div>
           </div>
           <div className={styles.auroraEffect}></div>
         </div>
@@ -117,37 +161,34 @@ function Home() {
                   <Link to="/blog" className={styles.viewMore}>查看全部</Link>
                 </div>
                 
-                {loading ? (
-                  [1, 2, 3].map(i => (
-                    <div key={i} className={`glass blur ${styles.blogCardSkeleton}`}>
-                      <div className="skeleton" style={{ height: '24px', width: '60%', marginBottom: '1rem' }}></div>
-                      <div className="skeleton" style={{ height: '60px', width: '100%' }}></div>
-                    </div>
-                  ))
-                ) : (
-                  latestPosts.map((post, idx) => (
-                    <motion.div
-                      key={post.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      whileHover={{ y: -5 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: idx * 0.1 }}
-                    >
-                      <Link to={`/blog/${post.id}`} className={`glass blur ${styles.homeBlogCard}`}>
-                        <div className={styles.postCardContent}>
-                          <h3 className={styles.postTitle}>{post.title}</h3>
-                          <p className={styles.postExcerpt}>{post.summary}</p>
-                          <div className={styles.postMeta}>
-                            <span>{new Date(post.created_at).toLocaleDateString()}</span>
-                            <span className={styles.dot}></span>
-                            <span>{post.view_count} 阅读</span>
+                <div className={styles.latestPosts} data-state={postsState}>
+                  {postsError ? (
+                    <div className={styles.loadError}>最新文章加载失败</div>
+                  ) : (
+                    latestPosts.map((post, idx) => (
+                      <motion.div
+                        key={post.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        whileHover={{ y: -5 }}
+                        viewport={{ once: true }}
+                        transition={{ delay: idx * 0.1 }}
+                      >
+                        <Link to={`/blog/${post.id}`} className={`glass blur ${styles.homeBlogCard}`}>
+                          <div className={styles.postCardContent}>
+                            <h3 className={styles.postTitle}>{post.title}</h3>
+                            <p className={styles.postExcerpt}>{post.summary}</p>
+                            <div className={styles.postMeta}>
+                              <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                              <span className={styles.dot}></span>
+                              <span>{post.view_count} 阅读</span>
+                            </div>
                           </div>
-                        </div>
-                      </Link>
-                    </motion.div>
-                  ))
-                )}
+                        </Link>
+                      </motion.div>
+                    ))
+                  )}
+                </div>
               </div>
 
               {/* 右侧：ContentRight */}

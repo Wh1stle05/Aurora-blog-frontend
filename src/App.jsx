@@ -9,12 +9,15 @@ import Footer from './components/layout/Footer/Footer.jsx'
 import ErrorBoundary from './components/layout/ErrorBoundary.jsx'
 import { ToastProvider } from './context/ToastContext.jsx'
 import { AuthProvider, useAuth } from './context/AuthContext.jsx'
+import PageSkeleton from './components/layout/PageSkeleton/PageSkeleton.jsx'
 
 // Feature Components
 import AuthModal from './components/features/auth/AuthModal.jsx'
 
+// Pages
+import Home from './pages/Home/Home.jsx'
+
 // Lazy Pages
-const Home = lazy(() => import('./pages/Home/Home.jsx'))
 const Blog = lazy(() => import('./pages/Blog/Blog.jsx'))
 const BlogDetail = lazy(() => import('./pages/BlogDetail/BlogDetail.jsx'))
 const About = lazy(() => import('./pages/About/About.jsx'))
@@ -22,17 +25,7 @@ const Contact = lazy(() => import('./pages/Contact/Contact.jsx'))
 const Profile = lazy(() => import('./pages/Profile/Profile.jsx'))
 
 // Loading Fallback
-const PageLoader = () => (
-  <div style={{ 
-    display: 'flex', 
-    justifyContent: 'center', 
-    alignItems: 'center', 
-    height: '60vh',
-    color: 'var(--text-muted)'
-  }}>
-    <div className="skeleton" style={{ width: '100px', height: '20px' }}></div>
-  </div>
-);
+const PageLoader = () => <PageSkeleton />;
 
 import './App.css'
 
