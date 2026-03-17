@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useParams } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
@@ -12,7 +12,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import CommentSection from '../../components/features/blog/CommentSection.jsx';
 import HighlightedCode from '../../components/features/blog/HighlightedCode.jsx';
-import { useToast } from '../../context/ToastContext.jsx';
+import { useToast } from '../../context/useToast.js';
 import { FaCalendar, FaUser, FaArrowLeft, FaEye, FaTag, FaThumbsUp, FaThumbsDown, FaCopy, FaCheck } from 'react-icons/fa';
 import { Helmet } from 'react-helmet-async';
 
@@ -97,7 +97,7 @@ function BlogDetail() {
 
   // 删掉之前的全局 highlight useEffect，因为现在由 HighlightedCode 组件自己负责了
 
-  const loadPost = (skipView = false) => {
+  const loadPost = useCallback((skipView = false) => {
     getPost(id, skipView)
       .then(data => {
         setPost(data);
@@ -107,7 +107,7 @@ function BlogDetail() {
       })
       .catch(err => toast.error(err.message || '获取文章失败'))
       .finally(() => setLoading(false));
-  };
+  }, [id, toast]);
 
   const handleCopy = (code, id) => {
     navigator.clipboard.writeText(code);
@@ -123,7 +123,7 @@ function BlogDetail() {
     } else {
       loadPost(true);
     }
-  }, [id]);
+  }, [loadPost]);
 
   const handleReact = async (value) => {
     try {
@@ -238,7 +238,7 @@ function BlogDetail() {
                 remarkPlugins={[remarkGfm]}
                 urlTransform={transformImageUri}
                 components={{
-                  img: ({node, ...props}) => (
+                  img: ({ ...props }) => (
                     <img 
                       style={{ 
                         maxWidth: '100%', 
@@ -253,7 +253,7 @@ function BlogDetail() {
                     />
                   ),
                   pre: ({ children }) => <>{children}</>,
-                  code({node, className, children, ...props}) {
+                  code({ className, children, ...props }) {
                     const match = /language-(\w+)/.exec(className || '');
                     const isBlock = match || String(children).includes('\n');
                     

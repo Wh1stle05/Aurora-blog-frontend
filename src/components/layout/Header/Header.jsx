@@ -1,16 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { NavLink, Link, useLocation } from 'react-router-dom';
+import React, { useState, useRef } from 'react';
+import { NavLink, Link } from 'react-router-dom';
 import styles from './Header.module.css';
-import { FaGithub, FaSun, FaMoon, FaUser, FaSignOutAlt, FaCamera } from 'react-icons/fa';
+import { FaGithub, FaSun, FaMoon, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import { motion, useScroll, useMotionValueEvent, LayoutGroup, useSpring } from 'framer-motion';
-import { useToast } from '../../../context/ToastContext.jsx';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 const BACKEND_HOST = API_BASE_URL.replace(/\/api$/, '');
 
-const Header = ({ theme, onToggleTheme, onLoginClick, user, onLogout, onUserUpdate }) => {
+const Header = ({ theme, onToggleTheme, onLoginClick, user, onLogout }) => {
   const [hidden, setHidden] = useState(false);
-  const toast = useToast();
   const { scrollY, scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,

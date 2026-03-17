@@ -1,13 +1,6 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { useToast } from './ToastContext';
-
-const AuthContext = createContext(null);
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error('useAuth must be used within an AuthProvider');
-  return context;
-};
+import React, { useState, useEffect, useCallback } from 'react';
+import { useToast } from './useToast.js';
+import { AuthContext } from './AuthContextBase.js';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);

@@ -1,5 +1,7 @@
 import React from 'react';
 
+const isDev = import.meta.env.DEV;
+
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -40,7 +42,7 @@ class ErrorBoundary extends React.Component {
             返回主页
           </button>
           
-          {process.env.NODE_ENV === 'development' && (
+          {isDev && (
             <pre style={{ 
               marginTop: '40px', 
               padding: '20px', 

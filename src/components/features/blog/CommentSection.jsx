@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { getComments, createComment, reactComment, deleteComment } from '../../../services/blogService';
 import styles from './CommentSection.module.css';
 import { FaUser, FaReply, FaThumbsUp, FaThumbsDown, FaTrash } from 'react-icons/fa';
-import { useToast } from '../../../context/ToastContext.jsx';
+import { useToast } from '../../../context/useToast.js';
 
 const CommentItem = ({ comment, depth = 0, onReply, onReact, onDelete, currentUser }) => {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -142,10 +142,12 @@ export default function CommentSection({ postId }) {
     try {
       const savedUser = localStorage.getItem('user');
       if (savedUser) setCurrentUser(JSON.parse(savedUser));
-    } catch (e) {}
+    } catch (err) {
+      console.warn('Failed to read user from storage', err);
+    }
   }, []);
 
-  const loadComments = () => {
+  const loadComments = useCallback(() => {
     getComments(postId).then(data => {
       setComments(data);
       setLoading(false);
@@ -153,11 +155,11 @@ export default function CommentSection({ postId }) {
       console.error(err);
       setLoading(false);
     });
-  };
+  }, [postId]);
 
   useEffect(() => {
     loadComments();
-  }, [postId]);
+  }, [loadComments]);
 
   const handleMainSubmit = async (e) => {
     e.preventDefault();

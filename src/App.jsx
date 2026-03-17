@@ -8,7 +8,8 @@ import Header from './components/layout/Header/Header.jsx'
 import Footer from './components/layout/Footer/Footer.jsx'
 import ErrorBoundary from './components/layout/ErrorBoundary.jsx'
 import { ToastProvider } from './context/ToastContext.jsx'
-import { AuthProvider, useAuth } from './context/AuthContext.jsx'
+import { AuthProvider } from './context/AuthContext.jsx'
+import { useAuth } from './context/useAuth.js'
 
 // Feature Components
 import AuthModal from './components/features/auth/AuthModal.jsx'

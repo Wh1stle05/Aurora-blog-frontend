@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { FaXmark } from "react-icons/fa6";
 import { motion, AnimatePresence } from "framer-motion";
-import { useToast } from "../../../context/ToastContext.jsx";
+import { useToast } from "../../../context/useToast.js";
 import Modal from "../../common/Modal/Modal.jsx";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';

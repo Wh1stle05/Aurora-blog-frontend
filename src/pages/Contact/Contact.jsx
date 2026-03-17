@@ -5,7 +5,7 @@ import PageTitle from '../../components/layout/PageTitle/PageTitle.jsx';
 import Body from '../../components/layout/Body/Body.jsx';
 import PageWrapper from '../../components/layout/PageWrapper/PageWrapper.jsx';
 import { FaPaperPlane, FaGithub, FaTwitter, FaEnvelope } from 'react-icons/fa';
-import { useToast } from '../../context/ToastContext.jsx';
+import { useToast } from '../../context/useToast.js';
 
 function Contact() {
   const [form, setForm] = useState({ name: '', email: '', content: '' });

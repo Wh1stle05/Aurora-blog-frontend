@@ -5,7 +5,7 @@ import styles from './Profile.module.css';
 import PageContainer from '../../components/layout/PageContainer/PageContainer.jsx';
 import Body from '../../components/layout/Body/Body.jsx';
 import PageWrapper from '../../components/layout/PageWrapper/PageWrapper.jsx';
-import { useToast } from '../../context/ToastContext.jsx';
+import { useToast } from '../../context/useToast.js';
 import Modal from '../../components/common/Modal/Modal.jsx';
 import { 
   uploadAvatar, 
