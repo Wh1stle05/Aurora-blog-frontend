@@ -157,21 +157,24 @@
   padding: 80px 0;
 }
 
-.mainGrid {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 1rem;
-  align-items: stretch;
+.secondContainer {
+  max-width: 100%;
+  width: 100%;
 }
 
-.ContentLeft, .ContentRight {
+.mainGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: stretch;
+  width: 100%;
+}
+
+.latestSection,
+.aboutSection {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-}
-
-.ContentRight {
-  height: 100%;
 }
 
 .sectionHeader {
@@ -199,6 +202,10 @@
   font-weight: 600;
   font-size: 0.95rem;
   transition: opacity 0.2s;
+}
+
+.sectionSpacer {
+  height: 24px;
 }
 
 .latestPosts {
@@ -326,11 +333,16 @@
   line-height: 1.7;
 }
 
-.statsGrid {
+.aboutGrid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
-  margin-top: auto;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
 }
 
 /* miniStatCard 布局深度修复：改为横向排布，左 Icon 右 Info */
@@ -391,9 +403,18 @@
   .mainGrid {
     grid-template-columns: 1fr;
   }
+  .aboutGrid {
+    grid-template-columns: 1fr;
+  }
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
+  .secondContainer {
+    max-width: 95%;
+  }
   .heroSection {
     height: auto;
     padding: 120px 0 80px;
