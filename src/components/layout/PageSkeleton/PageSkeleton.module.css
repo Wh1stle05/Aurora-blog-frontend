@@ -1,0 +1,18 @@
+.root {
+  min-height: var(--page-min-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  color: var(--text-muted);
+}
+
+.label {
+  font-size: 0.9rem;
+}

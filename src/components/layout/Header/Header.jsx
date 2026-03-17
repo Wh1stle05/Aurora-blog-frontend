@@ -1,5 +1,5 @@
-import React, { useState, useRef } from 'react';
-import { NavLink, Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from 'react';
+import { NavLink, Link, useLocation } from 'react-router-dom';
 import styles from './Header.module.css';
 import { FaGithub, FaSun, FaMoon, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import { motion, useScroll, useMotionValueEvent, LayoutGroup, useSpring } from 'framer-motion';
@@ -9,6 +9,7 @@ const BACKEND_HOST = API_BASE_URL.replace(/\/api$/, '');
 
 const Header = ({ theme, onToggleTheme, onLoginClick, user, onLogout }) => {
   const [hidden, setHidden] = useState(false);
+  const location = useLocation();
   const { scrollY, scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -17,6 +18,13 @@ const Header = ({ theme, onToggleTheme, onLoginClick, user, onLogout }) => {
   });
   const lastY = useRef(0);
   const [isLogoHovered, setIsLogoHovered] = useState(false);
+
+  useEffect(() => {
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
+    }
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const diff = latest - lastY.current;

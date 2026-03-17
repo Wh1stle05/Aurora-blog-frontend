@@ -103,52 +103,40 @@
   gap: 1.5rem;
 }
 
-.primaryButton {
+.heroText {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.heroButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   padding: 1rem 2.5rem;
   min-width: 180px;
-  background: var(--accent);
-  color: white;
   border: none;
   border-radius: 12px;
   font-size: 1.1rem;
   font-weight: 700;
   cursor: pointer;
   transition: var(--transition);
-  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+  color: #fff;
 }
 
-.primaryButton:hover {
-  background: var(--accent-hover);
+.heroButton.primary {
+  background: var(--accent);
+}
+
+.heroButton.secondary {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.heroButton:hover {
+  filter: brightness(1.05);
   transform: translateY(-3px);
-  box-shadow: 0 15px 30px rgba(59, 130, 246, 0.4);
-}
-
-.secondaryButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem 2.5rem;
-  min-width: 180px;
-  background: var(--input-bg);
-  backdrop-filter: blur(10px);
-  color: var(--text-primary);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.secondaryButton:hover {
-  background: var(--glass-border);
-  border-color: var(--text-muted);
-  transform: translateY(-3px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 .auroraEffect {
@@ -173,13 +161,17 @@
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 1rem;
-  align-items: start;
+  align-items: stretch;
 }
 
 .ContentLeft, .ContentRight {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+.ContentRight {
+  height: 100%;
 }
 
 .sectionHeader {
@@ -209,6 +201,30 @@
   transition: opacity 0.2s;
 }
 
+.latestPosts {
+  display: grid;
+  gap: 1rem;
+  min-height: 420px;
+}
+
+.latestPosts[data-state="loading"] {
+  visibility: hidden;
+}
+
+.latestPosts[data-state="ready"] {
+  visibility: visible;
+  animation: fadeIn 0.35s ease;
+}
+
+.latestPosts[data-state="error"] {
+  visibility: visible;
+}
+
+.loadError {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  padding: 1rem 0;
+}
 .homeBlogCard, .sideCard {
   display: flex;
   flex-direction: column;
@@ -219,6 +235,10 @@
   position: relative;
   overflow: hidden;
   background: var(--glass-bg);
+}
+
+.sideCard {
+  padding: 2.2rem;
 }
 
 .homeBlogCard:hover, .sideCard:hover {
@@ -310,15 +330,16 @@
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
+  margin-top: auto;
 }
 
 /* miniStatCard 布局深度修复：改为横向排布，左 Icon 右 Info */
 .miniStatCard {
-  padding: 1.2rem 1rem;
+  padding: 1.4rem 1.2rem;
   border-radius: 16px;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.25rem;
   border: 1px solid var(--glass-border);
 }
 
@@ -338,25 +359,32 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  gap: 0.35rem;
 }
 
 .miniStatValue {
   font-size: 1.3rem;
   font-weight: 800;
   color: var(--text-primary);
-  line-height: 1.1;
+  line-height: 1.25;
 }
 
 .miniStatLabel {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.7px;
+  line-height: 1.2;
 }
 
 .blogCardSkeleton {
   padding: 2.5rem;
   border-radius: 20px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @media (max-width: 1024px) {
