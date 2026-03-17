@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js";
 let scriptPromise;
@@ -20,14 +20,33 @@ function loadScript() {
   return scriptPromise;
 }
 
+function getTheme() {
+  if (typeof document === "undefined") return "dark";
+  const raw = document.documentElement.getAttribute("data-theme");
+  return raw === "light" ? "light" : "dark";
+}
+
 export default function TurnstileWidget({ siteKey, onVerify, onExpire, onError }) {
   const containerRef = useRef(null);
   const widgetIdRef = useRef(null);
   const callbacksRef = useRef({ onVerify, onExpire, onError });
+  const [theme, setTheme] = useState(getTheme);
 
   useEffect(() => {
     callbacksRef.current = { onVerify, onExpire, onError };
   }, [onVerify, onExpire, onError]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return () => {};
+    const observer = new MutationObserver(() => {
+      setTheme(getTheme());
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     let isMounted = true;
@@ -45,6 +64,7 @@ export default function TurnstileWidget({ siteKey, onVerify, onExpire, onError }
         }
         widgetIdRef.current = window.turnstile.render(containerRef.current, {
           sitekey: siteKey,
+          theme,
           callback: (token) => callbacksRef.current.onVerify?.(token),
           "expired-callback": () => callbacksRef.current.onExpire?.(),
           "error-callback": () => callbacksRef.current.onError?.(),
@@ -59,7 +79,7 @@ export default function TurnstileWidget({ siteKey, onVerify, onExpire, onError }
         widgetIdRef.current = null;
       }
     };
-  }, [siteKey]);
+  }, [siteKey, theme]);
 
   return (
     <div

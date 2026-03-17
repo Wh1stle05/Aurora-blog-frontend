@@ -15,6 +15,7 @@ export default function AuthModal({ onClose, onAuth }) {
   const [loading, setLoading] = useState(false);
   const [countdown, setCountdown] = useState(0);
   const [turnstileToken, setTurnstileToken] = useState("");
+  const [loginTurnstileToken, setLoginTurnstileToken] = useState("");
   const toast = useToast();
 
   useEffect(() => {
@@ -75,6 +76,11 @@ export default function AuthModal({ onClose, onAuth }) {
         toast.error("请输入验证码");
         return;
       }
+    } else {
+      if (!loginTurnstileToken) {
+        toast.error("请完成人机验证");
+        return;
+      }
     }
 
     setLoading(true);
@@ -95,7 +101,11 @@ export default function AuthModal({ onClose, onAuth }) {
       const loginRes = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: form.email, password: form.password }),
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+          turnstile_token: loginTurnstileToken,
+        }),
         credentials: 'include'
       });
 
@@ -107,6 +117,7 @@ export default function AuthModal({ onClose, onAuth }) {
       
       if (onAuth) onAuth(loginData);
       toast.success("登录成功");
+      setLoginTurnstileToken("");
       setTimeout(onClose, 800);
 
     } catch (err) {
@@ -142,13 +153,13 @@ export default function AuthModal({ onClose, onAuth }) {
       <div className="auth-switch">
         <button 
           className={mode === "login" ? "active" : ""} 
-          onClick={() => { setMode("login"); setStatus(null); setTurnstileToken(""); }}
+          onClick={() => { setMode("login"); setStatus(null); setTurnstileToken(""); setLoginTurnstileToken(""); }}
         >
           登录
         </button>
         <button 
           className={mode === "register" ? "active" : ""} 
-          onClick={() => { setMode("register"); setStatus(null); setTurnstileToken(""); }}
+          onClick={() => { setMode("register"); setStatus(null); setTurnstileToken(""); setLoginTurnstileToken(""); }}
         >
           注册
         </button>
@@ -173,6 +184,18 @@ export default function AuthModal({ onClose, onAuth }) {
               密码
               <input type="password" placeholder="字母+数字，6位以上" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
             </label>
+            <TurnstileWidget
+              siteKey={TURNSTILE_SITE_KEY}
+              onVerify={setLoginTurnstileToken}
+              onExpire={() => {
+                setLoginTurnstileToken("");
+                toast.error("验证已过期，请重新验证");
+              }}
+              onError={() => {
+                setLoginTurnstileToken("");
+                toast.error("验证服务不可用，请稍后再试");
+              }}
+            />
             <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }} className="btn" type="submit" disabled={loading}>
               {loading ? "正在同步..." : "登录"}
             </motion.button>
