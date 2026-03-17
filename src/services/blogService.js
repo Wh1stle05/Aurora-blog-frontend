@@ -232,11 +232,11 @@ export const uploadAvatar = async (file) => {
 };
 
 // 发送验证码
-export const sendCode = async (email) => {
+export const sendCode = async (email, turnstileToken) => {
   try {
     const response = await apiFetch(`${API_BASE_URL}/auth/send-code`, {
       method: "POST",
-      body: JSON.stringify({ email })
+      body: JSON.stringify({ email, turnstile_token: turnstileToken })
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.detail || '发送验证码失败');

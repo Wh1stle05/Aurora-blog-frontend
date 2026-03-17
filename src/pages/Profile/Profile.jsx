@@ -7,6 +7,7 @@ import Body from '../../components/layout/Body/Body.jsx';
 import PageWrapper from '../../components/layout/PageWrapper/PageWrapper.jsx';
 import { useToast } from '../../context/useToast.js';
 import Modal from '../../components/common/Modal/Modal.jsx';
+import TurnstileWidget from '../../components/common/TurnstileWidget.jsx';
 import { 
   uploadAvatar, 
   updateNickname, 
@@ -19,6 +20,7 @@ import {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 const BACKEND_HOST = API_BASE_URL.replace(/\/api$/, '');
+const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || "";
 
 function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
   return centerCrop(
@@ -37,6 +39,7 @@ export default function Profile({ user, onUserUpdate }) {
   const [emailInput, setEmailInput] = useState('');
   const [codeInput, setCodeInput] = useState('');
   const [countdown, setCountdown] = useState(0);
+  const [emailTurnstileToken, setEmailTurnstileToken] = useState("");
 
   // 头像裁剪
   const [imgSrc, setImgSrc] = useState('');
@@ -170,10 +173,15 @@ export default function Profile({ user, onUserUpdate }) {
       toast.error("请输入有效的邮箱地址");
       return;
     }
+    if (!emailTurnstileToken) {
+      toast.error("请完成人机验证");
+      return;
+    }
     try {
-      await sendCode(emailInput);
+      await sendCode(emailInput, emailTurnstileToken);
       setCountdown(60);
       toast.success("验证码已发送至新邮箱");
+      setEmailTurnstileToken("");
     } catch (err) {
       toast.error(err.message);
     }
@@ -292,7 +300,7 @@ export default function Profile({ user, onUserUpdate }) {
       {/* 邮箱修改 Modal */}
       <Modal
         open={showEmailModal}
-        onClose={() => setShowEmailModal(false)}
+        onClose={() => { setShowEmailModal(false); setEmailTurnstileToken(""); }}
         contentClassName={`modal-content ${styles.modal}`}
         contentVariants={modalVariants}
       >
@@ -322,12 +330,24 @@ export default function Profile({ user, onUserUpdate }) {
               <button 
                 className="btn ghost" 
                 onClick={handleSendCode}
-                disabled={countdown > 0}
+                disabled={countdown > 0 || !emailInput || !emailTurnstileToken}
               >
                 {countdown > 0 ? `${countdown}s` : '获取验证码'}
               </button>
             </div>
           </div>
+          <TurnstileWidget
+            siteKey={TURNSTILE_SITE_KEY}
+            onVerify={setEmailTurnstileToken}
+            onExpire={() => {
+              setEmailTurnstileToken("");
+              toast.error("验证已过期，请重新验证");
+            }}
+            onError={() => {
+              setEmailTurnstileToken("");
+              toast.error("验证服务不可用，请稍后再试");
+            }}
+          />
         </div>
         <div className={styles.modalFooter}>
           <button className="btn ghost" onClick={() => setShowEmailModal(false)}>取消</button>
