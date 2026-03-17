@@ -31,7 +31,7 @@ const StatCard = ({ icon: Icon, label, value, delay }) => (
       boxShadow: "0 10px 25px rgba(0, 0, 0, 0.15)",
       y: -5
     }}
-    viewport={{ once: true }}
+    viewport={{ once: true, margin: "-80% 0px 0px 0px" }}
     transition={{ delay }}
     className={`glass blur ${styles.miniStatCard}`}
   >
@@ -54,9 +54,9 @@ const titleVariants = {
 };
 
 const buttonVariants = {
-  hidden: { opacity: 0 },
-  showLeft: { opacity: 1, transition: { duration: 0.5, delay: 0 } },
-  showRight: { opacity: 1, transition: { duration: 0.5, delay: 0.4 } }
+  hidden: { opacity: 0, y: 30, filter: "blur(10px)" },
+  showLeft: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.5, ease: "easeOut", delay: 0 } },
+  showRight: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.5, ease: "easeOut", delay: 0.6 } }
 };
 
 function Home() {
@@ -152,15 +152,14 @@ function Home() {
 
         {/* 第二屏：ContentLeft 和 ContentRight 结构同步 */}
         <div className={styles.secondContainerWrapper}>
-          <PageContainer>
+          <PageContainer className={styles.secondContainer} style={{ maxWidth: '100%', width: '100%' }}>
             <div className={styles.mainGrid}>
-              {/* 左侧：ContentLeft */}
-              <div className={styles.ContentLeft}>
+              <section className={styles.latestSection}>
                 <div className={styles.sectionHeader}>
                   <h2 className={styles.sectionTitle}><FaRocket /> 最新发布</h2>
                   <Link to="/blog" className={styles.viewMore}>查看全部</Link>
                 </div>
-                
+
                 <div className={styles.latestPosts} data-state={postsState}>
                   {postsError ? (
                     <div className={styles.loadError}>最新文章加载失败</div>
@@ -171,7 +170,7 @@ function Home() {
                         initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         whileHover={{ y: -5 }}
-                        viewport={{ once: true }}
+                        viewport={{ once: true, margin: "-80% 0px 0px 0px" }}
                         transition={{ delay: idx * 0.1 }}
                       >
                         <Link to={`/blog/${post.id}`} className={`glass blur ${styles.homeBlogCard}`}>
@@ -189,48 +188,50 @@ function Home() {
                     ))
                   )}
                 </div>
-              </div>
+              </section>
 
-              {/* 右侧：ContentRight */}
-              <div className={styles.ContentRight}>
+              <section className={styles.aboutSection}>
                 <div className={styles.sectionHeader}>
                   <h2 className={styles.sectionTitle}><FaCode /> 关于本站</h2>
-                  <div style={{ height: '24px' }}></div>
+                  <div className={styles.sectionSpacer}></div>
                 </div>
 
-                <motion.div 
-                  whileHover={{ y: -5, borderColor: "rgba(59, 130, 246, 0.4)" }}
-                  className={`glass blur ${styles.sideCard}`}
-                >
-                  <h3 className={styles.sideTitle}>核心技术栈</h3>
-                  <div className={styles.techGrid}>
-                    <TechIcon icon={FaReact} name="React" color="#61DAFB" />
-                    <TechIcon icon={SiTypescript} name="TS" color="#3178C6" />
-                    <TechIcon icon={SiVite} name="Vite" color="#646CFF" />
-                    <TechIcon icon={SiFastapi} name="FastAPI" color="#05998B" />
-                    <TechIcon icon={FaPython} name="Python" color="#3776AB" />
-                    <TechIcon icon={SiPostgresql} name="Postgres" color="#4169E1" />
-                    <TechIcon icon={FaDocker} name="Docker" color="#2496ED" />
-                    <TechIcon icon={FaServer} name="Linux" color="#FCC624" />
-                  </div>
-                </motion.div>
+                <div className={styles.aboutGrid}>
+                  <motion.div 
+                    whileHover={{ y: -5, borderColor: "rgba(59, 130, 246, 0.4)" }}
+                    className={`glass blur ${styles.sideCard}`}
+                  >
+                    <h3 className={styles.sideTitle}>核心技术栈</h3>
+                    <div className={styles.techGrid}>
+                      <TechIcon icon={FaReact} name="React" color="#61DAFB" />
+                      <TechIcon icon={SiTypescript} name="TS" color="#3178C6" />
+                      <TechIcon icon={SiVite} name="Vite" color="#646CFF" />
+                      <TechIcon icon={SiFastapi} name="FastAPI" color="#05998B" />
+                      <TechIcon icon={FaPython} name="Python" color="#3776AB" />
+                      <TechIcon icon={SiPostgresql} name="Postgres" color="#4169E1" />
+                      <TechIcon icon={FaDocker} name="Docker" color="#2496ED" />
+                      <TechIcon icon={FaServer} name="Linux" color="#FCC624" />
+                    </div>
+                  </motion.div>
 
-                <motion.div
-                  whileHover={{ y: -5, borderColor: "rgba(59, 130, 246, 0.4)" }}
-                  className={`glass blur ${styles.sideCard}`}
-                >
-                  <h3 className={styles.sideTitle}><FaTerminal /> 关于空间</h3>
-                  <div className={styles.aboutText}>
-                    <p style={{ marginBottom: '0.8rem' }}>这里是我的博客，记录着技术学习和感悟。</p>
-                  </div>
-                </motion.div>
+                  <motion.div
+                    whileHover={{ y: -5, borderColor: "rgba(59, 130, 246, 0.4)" }}
+                    className={`glass blur ${styles.sideCard}`}
+                  >
+                    <h3 className={styles.sideTitle}><FaTerminal /> 关于空间</h3>
+                    <div className={styles.aboutText}>
+                      <p style={{ marginBottom: '0.8rem' }}>这里是我的博客，记录着技术学习和感悟。</p>
+                    </div>
+                  </motion.div>
+                </div>
+
                 <div className={styles.statsGrid}>
                   <StatCard icon={FaTerminal} label="文章总数" value={stats.posts} delay={0.1} />
                   <StatCard icon={FaChartLine} label="全站阅读" value={stats.views} delay={0.2} />
                   <StatCard icon={FaThumbsUp} label="获得点赞" value={stats.likes} delay={0.3} />
                   <StatCard icon={FaRocket} label="运行时间" value="365d+" delay={0.4} />
                 </div>
-              </div>
+              </section>
             </div>
           </PageContainer>
         </div>
