@@ -39,7 +39,10 @@ const CommentItem = ({ comment, depth = 0, onReply, onReact, onDelete, currentUs
   const shouldHideChildren = isDeleted;
 
   return (
-    <div className={`${styles.commentItem} ${depth > 0 ? styles.replyItem : ''} ${isHidden ? styles.hiddenComment : isDeleted ? styles.deletedComment : ''}`}>
+    <div
+      id={`comment-${comment.id}`}
+      className={`${styles.commentItem} ${depth > 0 ? styles.replyItem : ''} ${isHidden ? styles.hiddenComment : isDeleted ? styles.deletedComment : ''}`}
+    >
       <div className={styles.commentHeader}>
         <span className={styles.author}><FaUser size={12}/> {comment.author.nickname}</span>
         <span className={styles.date}>{new Date(comment.created_at).toLocaleString()}</span>
@@ -160,6 +163,19 @@ export default function CommentSection({ postId }) {
   useEffect(() => {
     loadComments();
   }, [loadComments]);
+
+  useEffect(() => {
+    if (!comments.length) return;
+    const hash = window.location.hash;
+    if (hash && hash.startsWith('#comment-')) {
+      const el = document.querySelector(hash);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add(styles.highlighted);
+        setTimeout(() => el.classList.remove(styles.highlighted), 2000);
+      }
+    }
+  }, [comments]);
 
   const handleMainSubmit = async (e) => {
     e.preventDefault();

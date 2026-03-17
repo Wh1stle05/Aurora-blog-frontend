@@ -246,3 +246,9 @@
 .expandBtn:hover {
   background: rgba(99, 102, 241, 0.1);
 }
+
+.highlighted {
+  outline: 2px solid var(--accent);
+  box-shadow: 0 0 0 4px rgba(79, 172, 254, 0.2);
+  transition: box-shadow 0.2s ease;
+}
