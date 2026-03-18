@@ -11,7 +11,7 @@ const Footer = () => {
         </div>
         <div className={styles.links}>
           <a 
-            href="https://github.com" 
+            href="https://github.com/Wh1stle05/Aurora-Blog" 
             target="_blank" 
             rel="noopener noreferrer" 
             className={styles.footerLink}

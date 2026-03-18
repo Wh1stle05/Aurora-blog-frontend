@@ -4,7 +4,7 @@ import PageContainer from '../../components/layout/PageContainer/PageContainer.j
 import PageTitle from '../../components/layout/PageTitle/PageTitle.jsx';
 import Body from '../../components/layout/Body/Body.jsx';
 import PageWrapper from '../../components/layout/PageWrapper/PageWrapper.jsx';
-import { FaPaperPlane, FaGithub, FaTwitter, FaEnvelope } from 'react-icons/fa';
+import { FaPaperPlane, FaGithub, FaEnvelope } from 'react-icons/fa';
 import { useToast } from '../../context/useToast.js';
 
 function Contact() {
@@ -37,13 +37,21 @@ function Contact() {
               
               <div className={styles.contactMethods}>
                 <div className={styles.method}>
-                  <FaEnvelope /> <span>@example.com</span>
+                  <FaEnvelope />
+                  <a className={styles.contactLink} href="mailto:a3165140148@outlook.com">
+                    a3165140148@outlook.com
+                  </a>
                 </div>
                 <div className={styles.method}>
-                  <FaGithub /> <span>github.com/aurora</span>
-                </div>
-                <div className={styles.method}>
-                  <FaTwitter /> <span>@aurora_dev</span>
+                  <FaGithub />
+                  <a
+                    className={styles.contactLink}
+                    href="https://github.com/Wh1stle05"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    github.com/Wh1stle05
+                  </a>
                 </div>
               </div>
             </div>
