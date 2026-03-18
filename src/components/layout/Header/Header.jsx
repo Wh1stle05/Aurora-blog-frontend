@@ -6,6 +6,15 @@ import { motion, useScroll, useMotionValueEvent, LayoutGroup, useSpring } from '
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 const BACKEND_HOST = API_BASE_URL.replace(/\/api$/, '');
+const CDN_BASE = import.meta.env.VITE_ASSET_CDN_BASE || '';
+
+const resolveAssetUrl = (value) => {
+  if (!value) return value;
+  if (value.startsWith('http://') || value.startsWith('https://')) return value;
+  if (value.startsWith('/')) return `${BACKEND_HOST}${value}`;
+  if (!CDN_BASE) return value;
+  return `${CDN_BASE.replace(/\/$/, '')}/${value}`;
+};
 
 const Header = ({ theme, onToggleTheme, onLoginClick, user, onLogout }) => {
   const [hidden, setHidden] = useState(false);
@@ -140,7 +149,7 @@ const Header = ({ theme, onToggleTheme, onLoginClick, user, onLogout }) => {
               <div className={styles.userSection}>
                 <Link to="/profile" className={styles.avatarWrapper} title="个人中心">
                   {user.avatar ? (
-                    <img src={`${BACKEND_HOST}${user.avatar}`} alt="avatar" className={styles.avatar} />
+                    <img src={resolveAssetUrl(user.avatar)} alt="avatar" className={styles.avatar} />
                   ) : (
                     <div className={styles.avatarPlaceholder}><FaUser /></div>
                   )}
@@ -157,7 +166,7 @@ const Header = ({ theme, onToggleTheme, onLoginClick, user, onLogout }) => {
               </button>
             )}
 
-            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="icon-btn" title="GitHub 仓库">
+            <a href="https://github.com/Wh1stle05/Aurora-Blog" target="_blank" rel="noopener noreferrer" className="icon-btn" title="GitHub 仓库">
               <FaGithub />
             </a>
           </div>

@@ -140,33 +140,37 @@ function BlogDetail() {
   };
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+  const CDN_BASE = import.meta.env.VITE_ASSET_CDN_BASE || '';
+  const BACKEND_HOST = API_BASE_URL.startsWith('http') ? API_BASE_URL.replace(/\/api$/, '') : '';
+
+  const resolveAssetUrl = (value) => {
+    if (!value) return value;
+    if (value.startsWith('http://') || value.startsWith('https://')) return value;
+    if (value.startsWith('/')) return BACKEND_HOST ? `${BACKEND_HOST}${value}` : value;
+    if (!CDN_BASE) return value;
+    return `${CDN_BASE.replace(/\/$/, '')}/${value}`;
+  };
 
   const transformImageUri = (uri) => {
     if (!uri) return uri;
-    // 0. 如果是完整的 http/https 链接，说明是云端存储（如 Vercel Blob），直接返回
     if (uri.startsWith('http://') || uri.startsWith('https://')) {
       return uri;
     }
 
-    // 1. 处理数据库存储的附件图片
-    // 提取纯文件名（去掉可能存在的 ./ 或 ../ 路径前缀）
-    const filename = uri.split('/').pop();
+    // 1. 处理数据库存储的附件图片（基于 object_key）
+    const placeholderMatch = uri.match(/^\{\{IMAGE_(.+)\}\}$/);
+    const filename = placeholderMatch ? placeholderMatch[1] : uri.split('/').pop();
     
     if (post && post.images) {
       const matchedImg = post.images.find(img => img.filename === filename);
-      if (matchedImg) {
-        return `${API_BASE_URL}/posts/image/${matchedImg.id}`;
+      if (matchedImg && matchedImg.object_key) {
+        return resolveAssetUrl(matchedImg.object_key);
       }
     }
 
-    // 2. 处理传统的 /uploads 路径
+    // 2. 处理 /uploads 路径（本地开发）
     if (uri.startsWith('/uploads')) {
-      // 如果后端和前端不在同一个域名，这里需要处理拼接
-      // 由于我们是在浏览器端，如果是相对路径，且我们有 API_BASE_URL，可以进行转换
-      // 简单起见，如果 API_BASE_URL 包含域名，我们拼上去；否则浏览器会默认请求当前域名的 /uploads
-      if (API_BASE_URL.startsWith('http')) {
-        return `${API_BASE_URL.replace(/\/api$/, '')}${uri}`;
-      }
+      return BACKEND_HOST ? `${BACKEND_HOST}${uri}` : uri;
     }
     return uri;
   };

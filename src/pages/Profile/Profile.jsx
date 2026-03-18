@@ -20,6 +20,15 @@ import {
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 const BACKEND_HOST = API_BASE_URL.replace(/\/api$/, '');
+const CDN_BASE = import.meta.env.VITE_ASSET_CDN_BASE || '';
+
+const resolveAssetUrl = (value) => {
+  if (!value) return value;
+  if (value.startsWith('http://') || value.startsWith('https://')) return value;
+  if (value.startsWith('/')) return `${BACKEND_HOST}${value}`;
+  if (!CDN_BASE) return value;
+  return `${CDN_BASE.replace(/\/$/, '')}/${value}`;
+};
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || "";
 
 function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
@@ -217,7 +226,7 @@ export default function Profile({ user, onUserUpdate }) {
               <div className={styles.avatarSection}>
                 <div className={styles.mainAvatar}>
                   {user.avatar ? (
-                    <img src={user.avatar.startsWith('http') ? user.avatar : `${BACKEND_HOST}${user.avatar}`} alt="Avatar" />
+                    <img src={resolveAssetUrl(user.avatar)} alt="Avatar" />
                   ) : (
                     <FaUser size={40} />
                   )}
