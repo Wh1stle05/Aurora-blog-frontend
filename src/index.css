@@ -9,6 +9,7 @@
   --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   --header-height: 85px;
   --page-min-height: calc(100dvh - var(--header-height));
+  --global-bg-image: url("/images/background.webp");
 }
 
 [data-theme='light'] {
@@ -46,7 +47,7 @@
 body {
   font-family: "Noto Sans SC", sans-serif;
   color: var(--text-primary);
-  background: url("/images/background.webp") no-repeat center center fixed;
+  background: var(--global-bg-image) no-repeat center center fixed;
   background-size: cover;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
