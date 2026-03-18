@@ -62,10 +62,11 @@ export default function AdminUpload({ user }) {
     });
 
     try {
+      const token = localStorage.getItem('access_token');
       const res = await fetch(`${API_BASE_URL}/admin/posts/upload-full`, {
         method: 'POST',
-        body: formData,
-        credentials: 'include'
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: formData
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || '发布失败');

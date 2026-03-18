@@ -3,10 +3,11 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 // 基础 fetch 封装，自动携带凭证
 const apiFetch = async (url, options = {}) => {
+  const token = localStorage.getItem('access_token');
   const defaultOptions = {
-    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
     },
   };
   
@@ -218,7 +219,11 @@ export const uploadAvatar = async (file) => {
     
     const response = await fetch(`${API_BASE_URL}/auth/avatar`, {
       method: "POST",
-      credentials: "include",
+      headers: {
+        ...(localStorage.getItem('access_token')
+          ? { Authorization: `Bearer ${localStorage.getItem('access_token')}` }
+          : {})
+      },
       body: formData
     });
     

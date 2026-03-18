@@ -46,8 +46,7 @@ export default function AuthModal({ onClose, onAuth }) {
       const res = await fetch(`${API_BASE_URL}/auth/send-code`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: form.email, turnstile_token: turnstileToken }),
-        credentials: 'include'
+        body: JSON.stringify({ email: form.email, turnstile_token: turnstileToken })
       });
       
       const data = await res.json();
@@ -89,8 +88,7 @@ export default function AuthModal({ onClose, onAuth }) {
         const regRes = await fetch(`${API_BASE_URL}/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(form),
-          credentials: 'include'
+          body: JSON.stringify(form)
         });
         
         const regData = await regRes.json();
@@ -105,14 +103,13 @@ export default function AuthModal({ onClose, onAuth }) {
           email: form.email,
           password: form.password,
           turnstile_token: loginTurnstileToken,
-        }),
-        credentials: 'include'
+        })
       });
 
       const loginData = await loginRes.json();
       if (!loginRes.ok) throw new Error(loginData.detail || '登录失败');
 
-      // Token is now handled by HttpOnly cookie
+      localStorage.setItem('access_token', loginData.access_token);
       localStorage.setItem('user', JSON.stringify(loginData.user));
       
       if (onAuth) onAuth(loginData);
