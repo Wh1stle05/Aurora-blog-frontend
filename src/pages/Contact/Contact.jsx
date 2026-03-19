@@ -7,19 +7,44 @@ import PageWrapper from '../../components/layout/PageWrapper/PageWrapper.jsx';
 import { FaPaperPlane, FaGithub, FaEnvelope } from 'react-icons/fa';
 import { useToast } from '../../context/useToast.js';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+
 function Contact() {
   const [form, setForm] = useState({ name: '', email: '', content: '' });
   const [status, setStatus] = useState(null);
   const toast = useToast();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus('sending');
-    // 模拟发送
-    setTimeout(() => {
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/contact`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          nickname: form.name,
+          email: form.email,
+          content: form.content
+        })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.detail || '消息发送失败');
+      }
+
       setStatus('success');
       toast.success('消息已发送！我会尽快回复你。');
       setForm({ name: '', email: '', content: '' });
+    } catch (error) {
+      setStatus(null);
+      toast.error(error.message || '消息发送失败');
+      return;
+    }
+
+    setTimeout(() => {
       setStatus(null);
     }, 1500);
   };
@@ -59,8 +84,9 @@ function Contact() {
             <div className={`glass blur ${styles.formSection}`}>
               <form className={styles.contactForm} onSubmit={handleSubmit}>
                 <div className={styles.formGroup}>
-                  <label>姓名</label>
+                  <label htmlFor="contact-name">姓名</label>
                   <input 
+                    id="contact-name"
                     type="text" 
                     value={form.name}
                     onChange={(e) => setForm({...form, name: e.target.value})}
@@ -68,8 +94,9 @@ function Contact() {
                   />
                 </div>
                 <div className={styles.formGroup}>
-                  <label>邮箱</label>
+                  <label htmlFor="contact-email">邮箱</label>
                   <input 
+                    id="contact-email"
                     type="email" 
                     value={form.email}
                     onChange={(e) => setForm({...form, email: e.target.value})}
@@ -77,8 +104,9 @@ function Contact() {
                   />
                 </div>
                 <div className={styles.formGroup}>
-                  <label>消息</label>
+                  <label htmlFor="contact-content">消息</label>
                   <textarea 
+                    id="contact-content"
                     value={form.content}
                     onChange={(e) => setForm({...form, content: e.target.value})}
                     required 
