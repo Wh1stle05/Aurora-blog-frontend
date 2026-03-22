@@ -5,6 +5,7 @@ import Body from '../../components/layout/Body/Body.jsx';
 import { Link } from 'react-router-dom';
 import PageWrapper from '../../components/layout/PageWrapper/PageWrapper.jsx';
 import { getPosts, getStats } from '../../services/blogService.js';
+import { formatUptimeDays } from './uptime.js';
 import { motion } from 'framer-motion';
 import { 
   FaCode, FaRocket, FaChartLine, 
@@ -96,6 +97,7 @@ function Home() {
   }, [loading]);
 
   const postsState = postsError ? "error" : (loading ? "loading" : "ready");
+  const uptimeDays = formatUptimeDays();
 
   return (
     <PageWrapper>
@@ -229,7 +231,7 @@ function Home() {
                   <StatCard icon={FaTerminal} label="文章总数" value={stats.posts} delay={0.1} />
                   <StatCard icon={FaChartLine} label="全站阅读" value={stats.views} delay={0.2} />
                   <StatCard icon={FaThumbsUp} label="获得点赞" value={stats.likes} delay={0.3} />
-                  <StatCard icon={FaRocket} label="运行时间" value="365d+" delay={0.4} />
+                  <StatCard icon={FaRocket} label="运行时间" value={uptimeDays} delay={0.4} />
                 </div>
               </section>
             </div>
