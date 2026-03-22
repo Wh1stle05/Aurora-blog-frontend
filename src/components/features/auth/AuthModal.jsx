@@ -4,8 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "../../../context/useToast.js";
 import Modal from "../../common/Modal/Modal.jsx";
 import TurnstileWidget from "../../common/TurnstileWidget.jsx";
+import { apiUrl } from '../../../utils/api.js';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || "";
 
 export default function AuthModal({ onClose, onAuth }) {
@@ -43,7 +43,7 @@ export default function AuthModal({ onClose, onAuth }) {
     setStatus(null);
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/send-code`, {
+      const res = await fetch(apiUrl('/api/auth/send-code'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: form.email, turnstile_token: turnstileToken })
@@ -85,7 +85,7 @@ export default function AuthModal({ onClose, onAuth }) {
     setLoading(true);
     try {
       if (mode === "register") {
-        const regRes = await fetch(`${API_BASE_URL}/auth/register`, {
+        const regRes = await fetch(apiUrl('/api/auth/register'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(form)
@@ -96,7 +96,7 @@ export default function AuthModal({ onClose, onAuth }) {
         toast.success("注册成功");
       }
 
-      const loginRes = await fetch(`${API_BASE_URL}/auth/login`, {
+      const loginRes = await fetch(apiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

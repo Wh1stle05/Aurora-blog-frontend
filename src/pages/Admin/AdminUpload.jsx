@@ -6,8 +6,7 @@ import Body from '../../components/layout/Body/Body.jsx';
 import PageWrapper from '../../components/layout/PageWrapper/PageWrapper.jsx';
 import { useToast } from '../../context/useToast.js';
 import { FaFileUpload, FaImage, FaTrash, FaPaperPlane } from 'react-icons/fa';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+import { apiUrl } from '../../utils/api.js';
 
 export default function AdminUpload({ user }) {
   const [mdFile, setMdFile] = useState(null);
@@ -63,7 +62,7 @@ export default function AdminUpload({ user }) {
 
     try {
       const token = localStorage.getItem('access_token');
-      const res = await fetch(`${API_BASE_URL}/admin/posts/upload-full`, {
+      const res = await fetch(apiUrl('/api/admin/posts/upload-full'), {
         method: 'POST',
         headers: token ? { Authorization: `Bearer ${token}` } : {},
         body: formData

@@ -3,18 +3,7 @@ import { NavLink, Link, useLocation } from 'react-router-dom';
 import styles from './Header.module.css';
 import { FaGithub, FaSun, FaMoon, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import { motion, useScroll, useMotionValueEvent, LayoutGroup, useSpring } from 'framer-motion';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
-const BACKEND_HOST = API_BASE_URL.replace(/\/api$/, '');
-const CDN_BASE = import.meta.env.VITE_ASSET_CDN_BASE || '';
-
-const resolveAssetUrl = (value) => {
-  if (!value) return value;
-  if (value.startsWith('http://') || value.startsWith('https://')) return value;
-  if (value.startsWith('/')) return `${BACKEND_HOST}${value}`;
-  if (!CDN_BASE) return value;
-  return `${CDN_BASE.replace(/\/$/, '')}/${value}`;
-};
+import { resolveAssetUrl } from '../../../utils/assets.js';
 
 const Header = ({ theme, onToggleTheme, onLoginClick, user, onLogout }) => {
   const [hidden, setHidden] = useState(false);

@@ -1,5 +1,4 @@
-// 博客API服务
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+import { apiUrl } from '../utils/api.js';
 
 // 基础 fetch 封装，自动携带凭证
 const apiFetch = async (url, options = {}) => {
@@ -47,7 +46,7 @@ export const getPosts = async (page = 1, pageSize = 5, search = '', tag = '', so
     if (tag) params.append('tag', tag);
     if (sortBy) params.append('sort_by', sortBy);
 
-    const response = await apiFetch(`${API_BASE_URL}/posts/paginated?${params}`);
+    const response = await apiFetch(apiUrl(`/api/posts/paginated?${params}`));
     const data = await response.json();
     if (data.success) {
       return data.data;
@@ -63,7 +62,7 @@ export const getPosts = async (page = 1, pageSize = 5, search = '', tag = '', so
 // 获取文章详情
 export const getPost = async (id, skipView = false) => {
   try {
-    const url = new URL(`${API_BASE_URL}/posts/${id}`, window.location.origin);
+    const url = new URL(apiUrl(`/api/posts/${id}`), window.location.origin);
     if (skipView) {
       url.searchParams.append('skip_view', 'true');
     }
@@ -80,7 +79,7 @@ export const getPost = async (id, skipView = false) => {
 // 获取评论列表
 export const getComments = async (postId) => {
   try {
-    const response = await apiFetch(`${API_BASE_URL}/posts/${postId}/comments`);
+    const response = await apiFetch(apiUrl(`/api/posts/${postId}/comments`));
     const data = await response.json();
     return data;
   } catch (error) {
@@ -92,7 +91,7 @@ export const getComments = async (postId) => {
 // 发表评论
 export const createComment = async (postId, content, parentId = null) => {
   try {
-    const response = await apiFetch(`${API_BASE_URL}/posts/${postId}/comments`, {
+    const response = await apiFetch(apiUrl(`/api/posts/${postId}/comments`), {
       method: 'POST',
       body: JSON.stringify({ content, parent_id: parentId })
     });
@@ -113,7 +112,7 @@ export const createComment = async (postId, content, parentId = null) => {
 // 删除评论 (用户软删除)
 export const deleteComment = async (commentId) => {
   try {
-    const response = await apiFetch(`${API_BASE_URL}/posts/comments/${commentId}`, {
+    const response = await apiFetch(apiUrl(`/api/posts/comments/${commentId}`), {
       method: 'DELETE'
     });
     const data = await response.json();
@@ -128,7 +127,7 @@ export const deleteComment = async (commentId) => {
 // 点赞/点踩
 export const reactPost = async (postId, value) => {
   try {
-    const response = await apiFetch(`${API_BASE_URL}/reactions`, {
+    const response = await apiFetch(apiUrl('/api/reactions'), {
       method: 'POST',
       body: JSON.stringify({ 
         target_type: 'post',
@@ -153,7 +152,7 @@ export const reactPost = async (postId, value) => {
 // 评论点赞/点踩
 export const reactComment = async (commentId, value) => {
   try {
-    const response = await apiFetch(`${API_BASE_URL}/reactions`, {
+    const response = await apiFetch(apiUrl('/api/reactions'), {
       method: 'POST',
       body: JSON.stringify({ 
         target_type: 'comment',
@@ -178,7 +177,7 @@ export const reactComment = async (commentId, value) => {
 // 获取站点统计信息
 export const getStats = async () => {
   try {
-    const response = await apiFetch(`${API_BASE_URL}/stats`);
+    const response = await apiFetch(apiUrl('/api/stats'));
     const data = await response.json();
     return data;
   } catch (error) {
@@ -190,7 +189,7 @@ export const getStats = async () => {
 // 获取 About 内容
 export const getAbout = async () => {
   try {
-    const response = await apiFetch(`${API_BASE_URL}/about`);
+    const response = await apiFetch(apiUrl('/api/about'));
     const data = await response.json();
     return data;
   } catch (error) {
@@ -202,7 +201,7 @@ export const getAbout = async () => {
 // 获取可用标签列表
 export const getTags = async () => {
   try {
-    const response = await apiFetch(`${API_BASE_URL}/tags`);
+    const response = await apiFetch(apiUrl('/api/tags'));
     const data = await response.json();
     return data;
   } catch (error) {
@@ -217,7 +216,7 @@ export const uploadAvatar = async (file) => {
     const formData = new FormData();
     formData.append("file", file);
     
-    const response = await fetch(`${API_BASE_URL}/auth/avatar`, {
+    const response = await fetch(apiUrl('/api/auth/avatar'), {
       method: "POST",
       headers: {
         ...(localStorage.getItem('access_token')
@@ -239,7 +238,7 @@ export const uploadAvatar = async (file) => {
 // 发送验证码
 export const sendCode = async (email, turnstileToken) => {
   try {
-    const response = await apiFetch(`${API_BASE_URL}/auth/send-code`, {
+    const response = await apiFetch(apiUrl('/api/auth/send-code'), {
       method: "POST",
       body: JSON.stringify({ email, turnstile_token: turnstileToken })
     });
@@ -255,7 +254,7 @@ export const sendCode = async (email, turnstileToken) => {
 // 更新昵称
 export const updateNickname = async (nickname) => {
   try {
-    const response = await apiFetch(`${API_BASE_URL}/auth/nickname`, {
+    const response = await apiFetch(apiUrl('/api/auth/nickname'), {
       method: "PUT",
       body: JSON.stringify({ nickname })
     });
@@ -271,7 +270,7 @@ export const updateNickname = async (nickname) => {
 // 更新邮箱
 export const updateEmail = async (email, code) => {
   try {
-    const response = await apiFetch(`${API_BASE_URL}/auth/email`, {
+    const response = await apiFetch(apiUrl('/api/auth/email'), {
       method: "PUT",
       body: JSON.stringify({ email, code })
     });
@@ -287,7 +286,7 @@ export const updateEmail = async (email, code) => {
 // 获取历史记录
 export const getNicknameHistory = async () => {
   try {
-    const response = await apiFetch(`${API_BASE_URL}/auth/history/nickname`);
+    const response = await apiFetch(apiUrl('/api/auth/history/nickname'));
     const data = await response.json();
     if (!response.ok) throw new Error(data.detail || '获取昵称历史失败');
     return data;
@@ -299,7 +298,7 @@ export const getNicknameHistory = async () => {
 
 export const getEmailHistory = async () => {
   try {
-    const response = await apiFetch(`${API_BASE_URL}/auth/history/email`);
+    const response = await apiFetch(apiUrl('/api/auth/history/email'));
     const data = await response.json();
     if (!response.ok) throw new Error(data.detail || '获取邮箱历史失败');
     return data;

@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useToast } from './useToast.js';
 import { AuthContext } from './AuthContextBase.js';
+import { apiUrl } from '../utils/api.js';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const toast = useToast();
-
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
   const checkAuth = useCallback(async () => {
     try {
@@ -17,7 +16,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.removeItem('user');
         return;
       }
-      const res = await fetch(`${API_BASE_URL}/auth/me`, {
+      const res = await fetch(apiUrl('/api/auth/me'), {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (res.ok) {
@@ -36,7 +35,7 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  }, [API_BASE_URL]);
+  }, []);
 
   useEffect(() => {
     checkAuth();
@@ -49,7 +48,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await fetch(`${API_BASE_URL}/auth/logout`, { method: 'POST' });
+      await fetch(apiUrl('/api/auth/logout'), { method: 'POST' });
     } catch (e) {
       console.error("Logout failed:", e);
     }

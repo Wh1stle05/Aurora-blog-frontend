@@ -6,8 +6,7 @@ import Body from '../../components/layout/Body/Body.jsx';
 import PageWrapper from '../../components/layout/PageWrapper/PageWrapper.jsx';
 import { FaPaperPlane, FaGithub, FaEnvelope } from 'react-icons/fa';
 import { useToast } from '../../context/useToast.js';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+import { apiUrl } from '../../utils/api.js';
 
 function Contact() {
   const [form, setForm] = useState({ name: '', email: '', content: '' });
@@ -19,7 +18,7 @@ function Contact() {
     setStatus('sending');
 
     try {
-      const res = await fetch(`${API_BASE_URL}/contact`, {
+      const res = await fetch(apiUrl('/api/contact'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
