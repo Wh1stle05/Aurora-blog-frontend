@@ -15,6 +15,8 @@ import HighlightedCode from '../../components/features/blog/HighlightedCode.jsx'
 import { useToast } from '../../context/useToast.js';
 import { FaCalendar, FaUser, FaArrowLeft, FaEye, FaTag, FaThumbsUp, FaThumbsDown, FaCopy, FaCheck } from 'react-icons/fa';
 import { Helmet } from 'react-helmet-async';
+import { resolveAssetUrl } from '../../utils/assets.js';
+import { transformImageUri } from './imageTransform.js';
 
 function BlogDetail() {
   const { id } = useParams();
@@ -139,42 +141,6 @@ function BlogDetail() {
     }
   };
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
-  const CDN_BASE = import.meta.env.VITE_ASSET_CDN_BASE || '';
-  const BACKEND_HOST = API_BASE_URL.startsWith('http') ? API_BASE_URL.replace(/\/api$/, '') : '';
-
-  const resolveAssetUrl = (value) => {
-    if (!value) return value;
-    if (value.startsWith('http://') || value.startsWith('https://')) return value;
-    if (value.startsWith('/')) return BACKEND_HOST ? `${BACKEND_HOST}${value}` : value;
-    if (!CDN_BASE) return value;
-    return `${CDN_BASE.replace(/\/$/, '')}/${value}`;
-  };
-
-  const transformImageUri = (uri) => {
-    if (!uri) return uri;
-    if (uri.startsWith('http://') || uri.startsWith('https://')) {
-      return uri;
-    }
-
-    // 1. 处理数据库存储的附件图片（基于 object_key）
-    const placeholderMatch = uri.match(/^\{\{IMAGE_(.+)\}\}$/);
-    const filename = placeholderMatch ? placeholderMatch[1] : uri.split('/').pop();
-    
-    if (post && post.images) {
-      const matchedImg = post.images.find(img => img.filename === filename);
-      if (matchedImg && matchedImg.object_key) {
-        return resolveAssetUrl(matchedImg.object_key);
-      }
-    }
-
-    // 2. 处理 /uploads 路径（本地开发）
-    if (uri.startsWith('/uploads')) {
-      return BACKEND_HOST ? `${BACKEND_HOST}${uri}` : uri;
-    }
-    return uri;
-  };
-
   if (loading) {
     return (
       <PageWrapper>
@@ -240,10 +206,11 @@ function BlogDetail() {
             <div className={styles.content}>
               <ReactMarkdown 
                 remarkPlugins={[remarkGfm]}
-                urlTransform={transformImageUri}
                 components={{
-                  img: ({ ...props }) => (
-                    <img 
+                  img: ({ node: _node, src, alt, ...props }) => {
+                    const resolvedSrc = transformImageUri(src, post, resolveAssetUrl);
+                    return (
+                    <img
                       style={{ 
                         maxWidth: '100%', 
                         borderRadius: '12px', 
@@ -251,11 +218,13 @@ function BlogDetail() {
                         boxShadow: 'var(--shadow)',
                         cursor: 'zoom-in'
                       }} 
-                      {...props} 
-                      alt={props.alt || 'blog image'}
-                      onClick={() => setSelectedImage(transformImageUri(props.src))}
+                      {...props}
+                      src={resolvedSrc}
+                      alt={alt || 'blog image'}
+                      onClick={() => setSelectedImage(resolvedSrc)}
                     />
-                  ),
+                    );
+                  },
                   pre: ({ children }) => <>{children}</>,
                   code({ className, children, ...props }) {
                     const match = /language-(\w+)/.exec(className || '');

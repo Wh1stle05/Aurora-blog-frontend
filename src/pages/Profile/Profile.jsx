@@ -17,18 +17,7 @@ import {
 import { 
   FaUser, FaEnvelope, FaCamera, FaShieldAlt
 } from 'react-icons/fa';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
-const BACKEND_HOST = API_BASE_URL.replace(/\/api$/, '');
-const CDN_BASE = import.meta.env.VITE_ASSET_CDN_BASE || '';
-
-const resolveAssetUrl = (value) => {
-  if (!value) return value;
-  if (value.startsWith('http://') || value.startsWith('https://')) return value;
-  if (value.startsWith('/')) return `${BACKEND_HOST}${value}`;
-  if (!CDN_BASE) return value;
-  return `${CDN_BASE.replace(/\/$/, '')}/${value}`;
-};
+import { resolveAssetUrl } from '../../utils/assets.js';
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || "";
 
 function centerAspectCrop(mediaWidth, mediaHeight, aspect) {
