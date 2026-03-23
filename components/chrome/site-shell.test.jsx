@@ -57,8 +57,8 @@ test('shows the large skeleton before pushing a new route', () => {
 
   fireEvent.click(screen.getByRole('button', { name: 'go-blog' }));
 
-  expect(screen.getByText('页面切换中...')).toBeInTheDocument();
-  expect(container.querySelectorAll('.skeleton').length).toBeGreaterThanOrEqual(5);
+  expect(screen.queryByText('页面切换中...')).not.toBeInTheDocument();
+  expect(container.querySelectorAll('[data-testid="blog-list-skeleton-card"]').length).toBeGreaterThanOrEqual(1);
   expect(push).not.toHaveBeenCalled();
 
   vi.advanceTimersByTime(180);

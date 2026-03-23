@@ -21,8 +21,7 @@ vi.mock('framer-motion', () => ({
       void initial;
       void animate;
       void transition;
-      void layoutId;
-      return <div style={style} {...domProps}>{children}</div>;
+      return <div data-layout-id={layoutId} style={style} {...domProps}>{children}</div>;
     },
   }),
   LayoutGroup: ({ children }) => <div>{children}</div>,
@@ -45,4 +44,19 @@ test('does not reset scroll on pathname render', () => {
   );
 
   expect(window.scrollTo).not.toHaveBeenCalled();
+});
+
+test('renders a standalone nav indicator instead of shared layout pill nodes', () => {
+  const { container } = render(
+    <Header
+      theme="dark"
+      onToggleTheme={vi.fn()}
+      onLoginClick={vi.fn()}
+      user={null}
+      onLogout={vi.fn()}
+    />,
+  );
+
+  expect(container.querySelector('[data-testid="nav-indicator"]')).toBeInTheDocument();
+  expect(container.querySelector('[data-layout-id="nav-pill"]')).not.toBeInTheDocument();
 });

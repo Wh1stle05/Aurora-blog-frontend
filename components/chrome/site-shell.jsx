@@ -8,6 +8,7 @@ import Header from './header.jsx';
 import Footer from './footer.jsx';
 import AuthModal from '../../src/components/features/auth/AuthModal.jsx';
 import PageSkeleton from '../../src/components/layout/PageSkeleton/PageSkeleton.jsx';
+import { BlogListSkeleton } from '../pages/blog-list-page.jsx';
 import { useAuth } from '../../src/context/useAuth.js';
 import { useTheme } from '../providers/theme-provider.jsx';
 
@@ -53,6 +54,9 @@ export function SiteShell({ children }) {
   };
 
   const shellLoading = !ready || loading;
+  const routeLoadingFallback = pendingPath === '/blog'
+    ? <BlogListSkeleton pageSize={5} />
+    : <PageSkeleton message={shellLoading ? '同步站点状态...' : '页面切换中...'} />;
 
   return (
     <div className="app-root">
@@ -64,10 +68,11 @@ export function SiteShell({ children }) {
         onLogout={logout}
         onNavigate={handleNavigate}
         routeTransitioning={isRouteLoading}
+        transitionTargetPath={pendingPath}
       />
       <main className="page-shell">
         {shellLoading || isRouteLoading ? (
-          <PageSkeleton message={shellLoading ? '同步站点状态...' : '页面切换中...'} />
+          routeLoadingFallback
         ) : (
           <AnimatePresence mode="wait">
             <motion.div

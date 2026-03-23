@@ -3,16 +3,17 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FaGithub, FaMoon, FaSignOutAlt, FaSun, FaUser } from 'react-icons/fa';
-import { motion, LayoutGroup, useMotionValueEvent, useScroll, useSpring } from 'framer-motion';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { motion, useMotionValueEvent, useScroll, useSpring } from 'framer-motion';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import styles from '../../src/components/layout/Header/Header.module.css';
 import { resolveAssetUrl } from '../../lib/assets.js';
 
-export default function Header({ theme, onToggleTheme, onLoginClick, user, onLogout, onNavigate, routeTransitioning = false }) {
+export default function Header({ theme, onToggleTheme, onLoginClick, user, onLogout, onNavigate, routeTransitioning = false, transitionTargetPath = null }) {
   const pathname = usePathname();
   const [hidden, setHidden] = useState(false);
   const [isLogoHovered, setIsLogoHovered] = useState(false);
+  const [indicator, setIndicator] = useState({ left: 0, width: 0, opacity: 0 });
   const { scrollY, scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -20,6 +21,8 @@ export default function Header({ theme, onToggleTheme, onLoginClick, user, onLog
     restDelta: 0.001,
   });
   const lastY = useRef(0);
+  const navRefs = useRef({});
+  const activePath = transitionTargetPath || pathname;
 
   useEffect(() => {
     if (!routeTransitioning) return;
@@ -48,7 +51,27 @@ export default function Header({ theme, onToggleTheme, onLoginClick, user, onLog
     { path: '/contact', label: '联系' },
   ], []);
 
-  const isActive = (path) => pathname === path || (path !== '/' && pathname?.startsWith(path));
+  const isActive = (path) => activePath === path || (path !== '/' && activePath?.startsWith(path));
+
+  const syncIndicatorToPath = (path) => {
+    const node = navRefs.current[path];
+    if (!node) return;
+    setIndicator({
+      left: node.offsetLeft,
+      width: node.offsetWidth,
+      opacity: 1,
+    });
+  };
+
+  useLayoutEffect(() => {
+    syncIndicatorToPath(activePath);
+  }, [activePath]);
+
+  useEffect(() => {
+    const handleResize = () => syncIndicatorToPath(activePath);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [activePath]);
 
   const handleInternalNavigation = (event, path) => {
     if (!onNavigate) return;
@@ -63,6 +86,7 @@ export default function Header({ theme, onToggleTheme, onLoginClick, user, onLog
       return;
     }
     event.preventDefault();
+    syncIndicatorToPath(path);
     onNavigate(path);
   };
 
@@ -124,30 +148,30 @@ export default function Header({ theme, onToggleTheme, onLoginClick, user, onLog
             </div>
           </Link>
 
-          <LayoutGroup id="nav-group">
-            <nav className={styles.navLinks}>
-              {navItems.map((item) => {
-                const active = isActive(item.path);
-                return (
-                  <Link
-                    key={item.path}
-                    href={item.path}
-                    className={`${styles.navButton} ${active ? styles.active : ''}`}
-                    onClick={(event) => handleInternalNavigation(event, item.path)}
-                  >
-                    <span className={styles.navLabel}>{item.label}</span>
-                    {active ? (
-                      <motion.div
-                        layoutId="nav-pill"
-                        className={styles.activePill}
-                        transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-                      />
-                    ) : null}
-                  </Link>
-                );
-              })}
-            </nav>
-          </LayoutGroup>
+          <nav className={styles.navLinks}>
+            <motion.div
+              data-testid="nav-indicator"
+              className={styles.activePill}
+              animate={{ x: indicator.left, width: indicator.width, opacity: indicator.opacity }}
+              transition={{ type: 'spring', stiffness: 350, damping: 32 }}
+            />
+            {navItems.map((item) => {
+              const active = isActive(item.path);
+              return (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  ref={(node) => {
+                    navRefs.current[item.path] = node;
+                  }}
+                  className={`${styles.navButton} ${active ? styles.active : ''}`}
+                  onClick={(event) => handleInternalNavigation(event, item.path)}
+                >
+                  <span className={styles.navLabel}>{item.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
 
           <div className={styles.navActions}>
             <button className="theme-toggle" onClick={onToggleTheme} title="切换主题">
