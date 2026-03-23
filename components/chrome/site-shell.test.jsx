@@ -61,6 +61,6 @@ test('shows the large skeleton before pushing a new route', () => {
   expect(container.querySelectorAll('[data-testid="blog-list-skeleton-card"]').length).toBeGreaterThanOrEqual(1);
   expect(push).not.toHaveBeenCalled();
 
-  vi.advanceTimersByTime(180);
+  vi.advanceTimersByTime(150);
   expect(push).toHaveBeenCalledWith('/blog');
 });

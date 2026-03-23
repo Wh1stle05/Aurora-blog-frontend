@@ -36,7 +36,7 @@ vi.mock('../../src/legacy-pages/Home/uptime.js', () => ({
   formatUptimeDays: () => '2d',
 }));
 
-test('renders the restored home second screen content without uptime duplication or stray undefined text', () => {
+test('renders the hero with only the centered main title while keeping the restored second screen content', () => {
   render(
     <HomePage
       latestPosts={[
@@ -53,6 +53,9 @@ test('renders the restored home second screen content without uptime duplication
     />,
   );
 
+  expect(screen.getByRole('heading', { name: '欢迎来到 Aurora 空间' })).toBeInTheDocument();
+  expect(screen.queryByText('Explore the edge of code')).not.toBeInTheDocument();
+  expect(screen.queryByText('这里记录开发、部署、工具链和长期维护中的真实经验。不是模板站，而是一套持续迭代的工程现场。')).not.toBeInTheDocument();
   expect(screen.getByText('关于我')).toBeInTheDocument();
   expect(screen.getByText('这里是我的博客，记录着技术学习和感悟。')).toBeInTheDocument();
   expect(screen.getByText('2d')).toBeInTheDocument();

@@ -36,7 +36,7 @@ export function SiteShell({ children }) {
     revealTimerRef.current = window.setTimeout(() => {
       setIsRouteLoading(false);
       setPendingPath(null);
-    }, 280);
+    }, 150);
   }, [pathname, pendingPath]);
 
   const handleNavigate = (nextPath) => {
@@ -50,7 +50,7 @@ export function SiteShell({ children }) {
     navigateTimerRef.current = window.setTimeout(() => {
       window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
       router.push(nextPath);
-    }, 180);
+    }, 150);
   };
 
   const shellLoading = !ready || loading;
