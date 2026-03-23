@@ -10,10 +10,15 @@ vi.mock('next/navigation', () => ({
 }));
 
 vi.mock('./header.jsx', () => ({
-  default: ({ onNavigate }) => (
-    <button type="button" onClick={() => onNavigate('/blog')}>
-      go-blog
-    </button>
+  default: ({ onNavigate, routeTransitioning, transitionTargetPath }) => (
+    <>
+      <button type="button" onClick={() => onNavigate('/blog')}>
+        go-blog
+      </button>
+      <div data-testid="route-state">
+        {routeTransitioning ? `transitioning:${transitionTargetPath}` : 'idle'}
+      </div>
+    </>
   ),
 }));
 
@@ -24,11 +29,12 @@ vi.mock('./footer.jsx', () => ({
 vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
   motion: new Proxy({}, {
-    get: () => ({ children, initial, animate, exit: _exit, transition: _transition, ...props }) => (
+    get: () => ({ children, initial, animate, exit: _exit, transition: _transition, onAnimationComplete, ...props }) => (
       <div
         data-testid={props.className === 'page-transition-wrapper' ? 'page-transition-wrapper' : undefined}
         data-initial={typeof initial === 'boolean' ? String(initial) : JSON.stringify(initial)}
         data-animate-state={animate?.opacity === 0 ? 'hidden' : 'visible'}
+        onAnimationEnd={onAnimationComplete}
         {...props}
       >
         {children}
@@ -58,15 +64,20 @@ vi.mock('../providers/theme-provider.jsx', () => ({
   }),
 }));
 
-test('navigates immediately without forcing a route skeleton', () => {
+test('starts route transition first and only pushes after exit completes', () => {
   const { container } = render(<SiteShell><div>page-body</div></SiteShell>);
   push.mockReset();
   window.scrollTo = vi.fn();
 
   fireEvent.click(screen.getByRole('button', { name: 'go-blog' }));
 
+  expect(screen.getByTestId('route-state')).toHaveTextContent('transitioning:/blog');
   expect(screen.queryByText('页面切换中...')).not.toBeInTheDocument();
   expect(container.querySelectorAll('[data-testid="blog-list-skeleton-card"]').length).toBe(0);
+  expect(push).not.toHaveBeenCalled();
+
+  fireEvent.animationEnd(screen.getByTestId('page-transition-wrapper'));
+
   expect(push).toHaveBeenCalledWith('/blog');
 });
 
