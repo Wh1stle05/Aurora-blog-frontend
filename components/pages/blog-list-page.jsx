@@ -52,6 +52,19 @@ export const BlogListSkeleton = ({ pageSize = 5 }) => (
   </motion.div>
 );
 
+export const BlogListLoadingShell = ({ pageSize = 5 }) => (
+  <PageWrapper>
+    <Body>
+      <PageContainer>
+        <PageTitle>技术博客</PageTitle>
+        <div className={styles.blogList}>
+          <BlogListSkeleton pageSize={pageSize} />
+        </div>
+      </PageContainer>
+    </Body>
+  </PageWrapper>
+);
+
 export default function BlogListPage({ initialPosts, initialTags, initialPageSize = 5, initialPage = 1, initialTotalPages = 1 }) {
   const [posts, setPosts] = useState(initialPosts);
   const [availableTags, setAvailableTags] = useState(initialTags);

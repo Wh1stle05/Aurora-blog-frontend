@@ -1,5 +1,5 @@
-import { BlogListSkeleton } from '../../components/pages/blog-list-page.jsx';
+import { BlogListLoadingShell } from '../../components/pages/blog-list-page.jsx';
 
 export default function BlogLoading() {
-  return <BlogListSkeleton pageSize={5} />;
+  return <BlogListLoadingShell pageSize={5} />;
 }
