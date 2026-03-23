@@ -3,26 +3,10 @@ import styles from "./PageSkeleton.module.css";
 export default function PageSkeleton({ message = "加载中..." }) {
   return (
     <div className={styles.root}>
-      <div className={`glass blur ${styles.frame}`}>
-        <div className={styles.headerRow}>
-          <div className="skeleton" style={{ width: "120px", height: "14px" }}></div>
-          <div className="skeleton" style={{ width: "84px", height: "14px" }}></div>
-        </div>
-        <div className={styles.heroBlock}>
-          <div className="skeleton" style={{ width: "46%", height: "44px" }}></div>
-          <div className="skeleton" style={{ width: "82%", height: "18px" }}></div>
-          <div className="skeleton" style={{ width: "68%", height: "18px" }}></div>
-        </div>
-        <div className={styles.grid}>
-          <div className={styles.column}>
-            <div className="skeleton" style={{ width: "100%", height: "120px" }}></div>
-            <div className="skeleton" style={{ width: "100%", height: "120px" }}></div>
-          </div>
-          <div className={styles.column}>
-            <div className="skeleton" style={{ width: "100%", height: "120px" }}></div>
-            <div className="skeleton" style={{ width: "100%", height: "120px" }}></div>
-          </div>
-        </div>
+      <div data-testid="page-skeleton-inner" className={styles.inner}>
+        <div className="skeleton" style={{ width: "180px", height: "16px", borderRadius: "999px" }}></div>
+        <div className="skeleton" style={{ width: "320px", maxWidth: "76vw", height: "18px", borderRadius: "999px" }}></div>
+        <div className="skeleton" style={{ width: "240px", maxWidth: "62vw", height: "18px", borderRadius: "999px" }}></div>
         <div className={styles.label}>{message}</div>
       </div>
     </div>
