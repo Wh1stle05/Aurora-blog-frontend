@@ -33,6 +33,22 @@ const titleVariants = {
   },
 };
 
+const buttonVariants = {
+  hidden: { opacity: 0, y: 30, filter: 'blur(10px)' },
+  showLeft: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transition: { duration: 0.5, ease: 'easeOut', delay: 0 },
+  },
+  showRight: {
+    opacity: 1,
+    y: 0,
+    filter: 'blur(0px)',
+    transition: { duration: 0.5, ease: 'easeOut', delay: 0.6 },
+  },
+};
+
 const techStack = [
   { icon: FaReact, name: 'React', color: '#61dafb' },
   { icon: SiTypescript, name: 'TS', color: '#3178C6' },
@@ -88,17 +104,22 @@ export default function HomePage({ latestPosts = [], stats = {} }) {
           <div className={styles.heroCenterer}>
             <div className={styles.heroContent}>
               <motion.div className={styles.heroText} variants={titleVariants} initial="hidden" animate="show">
+                <div className={styles.heroBadge}>
+                  <span className={styles.pulse}></span>
+                  Explore the edge of code
+                </div>
                 <h1 className={styles.heroTitle}>
                   欢迎来到 <span className={styles.accentText}>Aurora</span> 空间
                 </h1>
+                <p className={styles.heroSubtitle}></p>
               </motion.div>
               <div data-testid="hero-actions" className={styles.heroActions}>
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={heroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }} transition={{ duration: 0.45 }}>
+                <motion.div variants={buttonVariants} initial="hidden" animate={heroReady ? 'showLeft' : 'hidden'}>
                   <Link href="/blog">
                     <button className={`${styles.heroButton} ${styles.primary}`}>开始阅读</button>
                   </Link>
                 </motion.div>
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={heroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }} transition={{ duration: 0.45, delay: 0.14 }}>
+                <motion.div variants={buttonVariants} initial="hidden" animate={heroReady ? 'showRight' : 'hidden'}>
                   <Link href="/about">
                     <button className={`${styles.heroButton} ${styles.secondary}`}>关于作者</button>
                   </Link>

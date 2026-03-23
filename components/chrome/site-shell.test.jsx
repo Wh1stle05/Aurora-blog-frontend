@@ -70,10 +70,11 @@ test('navigates immediately without forcing a route skeleton', () => {
   expect(push).toHaveBeenCalledWith('/blog');
 });
 
-test('disables initial page transition on first render to avoid hydration flash', () => {
+test('renders route content without a client enter-transition wrapper', () => {
   window.requestAnimationFrame = vi.fn(() => 1);
   window.cancelAnimationFrame = vi.fn();
   const { container } = render(<SiteShell><div>page-body</div></SiteShell>);
 
-  expect(container.querySelector('[data-testid="page-transition-wrapper"]')).toHaveAttribute('data-animate-state', 'hidden');
+  expect(container.querySelector('[data-testid="page-transition-wrapper"]')).toBeNull();
+  expect(screen.getByText('page-body')).toBeInTheDocument();
 });
