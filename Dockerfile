@@ -1,20 +1,20 @@
-# 选择 Node 官方镜像
-FROM node:22.19.0
-
-# 设置工作目录
+FROM node:22.19.0 AS deps
 WORKDIR /app
-
-# 先复制依赖文件
 COPY package*.json ./
+RUN npm install --omit=optional
 
-# 安装依赖
-RUN npm install
-
-# 复制项目源码
+FROM node:22.19.0 AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+RUN npm run build
 
-# 暴露端口（开发环境常见3000）
+FROM node:22.19.0 AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
 EXPOSE 3000
-
-# 启动开发服务器
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]

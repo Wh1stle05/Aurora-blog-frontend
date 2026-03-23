@@ -1,0 +1,26 @@
+@import '../src/index.css';
+@import '../src/App.css';
+
+.not-found-shell {
+  min-height: var(--page-min-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.not-found-card {
+  max-width: 520px;
+  width: 100%;
+  padding: 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: center;
+}
+
+.eyebrow {
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}

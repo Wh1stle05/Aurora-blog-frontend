@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { NavLink, Link, useLocation } from 'react-router-dom';
+import { NavLink, Link, useLocation } from '../../../router/compat.jsx';
 import styles from './Header.module.css';
 import { FaGithub, FaSun, FaMoon, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import { motion, useScroll, useMotionValueEvent, LayoutGroup, useSpring } from 'framer-motion';
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
-const BACKEND_HOST = API_BASE_URL.replace(/\/api$/, '');
+import { resolveAssetUrl } from '../../../utils/assets.js';
 
 const Header = ({ theme, onToggleTheme, onLoginClick, user, onLogout }) => {
   const [hidden, setHidden] = useState(false);
@@ -140,7 +138,7 @@ const Header = ({ theme, onToggleTheme, onLoginClick, user, onLogout }) => {
               <div className={styles.userSection}>
                 <Link to="/profile" className={styles.avatarWrapper} title="个人中心">
                   {user.avatar ? (
-                    <img src={`${BACKEND_HOST}${user.avatar}`} alt="avatar" className={styles.avatar} />
+                    <img src={resolveAssetUrl(user.avatar)} alt="avatar" className={styles.avatar} />
                   ) : (
                     <div className={styles.avatarPlaceholder}><FaUser /></div>
                   )}

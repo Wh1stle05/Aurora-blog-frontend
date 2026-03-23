@@ -3,8 +3,11 @@ import { FaXmark } from "react-icons/fa6";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "../../../context/useToast.js";
 import Modal from "../../common/Modal/Modal.jsx";
+import TurnstileWidget from "../../common/TurnstileWidget.jsx";
+import { apiUrl } from '../../../utils/api.js';
+import { PUBLIC_TURNSTILE_SITE_KEY } from '../../../../lib/env.js';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+const TURNSTILE_SITE_KEY = PUBLIC_TURNSTILE_SITE_KEY;
 
 export default function AuthModal({ onClose, onAuth }) {
   const [mode, setMode] = useState("login");
@@ -12,6 +15,8 @@ export default function AuthModal({ onClose, onAuth }) {
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
   const [countdown, setCountdown] = useState(0);
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [loginTurnstileToken, setLoginTurnstileToken] = useState("");
   const toast = useToast();
 
   useEffect(() => {
@@ -32,14 +37,17 @@ export default function AuthModal({ onClose, onAuth }) {
       toast.error("请先输入邮箱");
       return;
     }
+    if (!turnstileToken) {
+      toast.error("请完成人机验证");
+      return;
+    }
     setStatus(null);
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/auth/send-code`, {
+      const res = await fetch(apiUrl('/api/auth/send-code'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: form.email }),
-        credentials: 'include'
+        body: JSON.stringify({ email: form.email, turnstile_token: turnstileToken })
       });
       
       const data = await res.json();
@@ -47,6 +55,7 @@ export default function AuthModal({ onClose, onAuth }) {
       
       setCountdown(60);
       toast.success("验证码已发送");
+      setTurnstileToken("");
     } catch (err) {
       toast.error(err.message);
     } finally {
@@ -67,16 +76,20 @@ export default function AuthModal({ onClose, onAuth }) {
         toast.error("请输入验证码");
         return;
       }
+    } else {
+      if (!loginTurnstileToken) {
+        toast.error("请完成人机验证");
+        return;
+      }
     }
 
     setLoading(true);
     try {
       if (mode === "register") {
-        const regRes = await fetch(`${API_BASE_URL}/auth/register`, {
+        const regRes = await fetch(apiUrl('/api/auth/register'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(form),
-          credentials: 'include'
+          body: JSON.stringify(form)
         });
         
         const regData = await regRes.json();
@@ -84,21 +97,25 @@ export default function AuthModal({ onClose, onAuth }) {
         toast.success("注册成功");
       }
 
-      const loginRes = await fetch(`${API_BASE_URL}/auth/login`, {
+      const loginRes = await fetch(apiUrl('/api/auth/login'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: form.email, password: form.password }),
-        credentials: 'include'
+        body: JSON.stringify({
+          email: form.email,
+          password: form.password,
+          turnstile_token: loginTurnstileToken,
+        })
       });
 
       const loginData = await loginRes.json();
       if (!loginRes.ok) throw new Error(loginData.detail || '登录失败');
 
-      // Token is now handled by HttpOnly cookie
+      localStorage.setItem('access_token', loginData.access_token);
       localStorage.setItem('user', JSON.stringify(loginData.user));
       
       if (onAuth) onAuth(loginData);
       toast.success("登录成功");
+      setLoginTurnstileToken("");
       setTimeout(onClose, 800);
 
     } catch (err) {
@@ -134,13 +151,13 @@ export default function AuthModal({ onClose, onAuth }) {
       <div className="auth-switch">
         <button 
           className={mode === "login" ? "active" : ""} 
-          onClick={() => { setMode("login"); setStatus(null); }}
+          onClick={() => { setMode("login"); setStatus(null); setTurnstileToken(""); setLoginTurnstileToken(""); }}
         >
           登录
         </button>
         <button 
           className={mode === "register" ? "active" : ""} 
-          onClick={() => { setMode("register"); setStatus(null); }}
+          onClick={() => { setMode("register"); setStatus(null); setTurnstileToken(""); setLoginTurnstileToken(""); }}
         >
           注册
         </button>
@@ -165,6 +182,18 @@ export default function AuthModal({ onClose, onAuth }) {
               密码
               <input type="password" placeholder="字母+数字，6位以上" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
             </label>
+            <TurnstileWidget
+              siteKey={TURNSTILE_SITE_KEY}
+              onVerify={setLoginTurnstileToken}
+              onExpire={() => {
+                setLoginTurnstileToken("");
+                toast.error("验证已过期，请重新验证");
+              }}
+              onError={() => {
+                setLoginTurnstileToken("");
+                toast.error("验证服务不可用，请稍后再试");
+              }}
+            />
             <motion.button whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }} className="btn" type="submit" disabled={loading}>
               {loading ? "正在同步..." : "登录"}
             </motion.button>
@@ -195,11 +224,23 @@ export default function AuthModal({ onClose, onAuth }) {
               验证码
               <div className="v-code-group">
                 <input style={{ flex: 1 }} placeholder="6位验证码" value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} required />
-                <button type="button" className="v-code-btn" disabled={countdown > 0 || !form.email} onClick={sendCode}>
+                <button type="button" className="v-code-btn" disabled={countdown > 0 || !form.email || !turnstileToken} onClick={sendCode}>
                   {countdown > 0 ? `${countdown}s 后重试` : "获取验证码"}
                 </button>
               </div>
             </label>
+            <TurnstileWidget
+              siteKey={TURNSTILE_SITE_KEY}
+              onVerify={setTurnstileToken}
+              onExpire={() => {
+                setTurnstileToken("");
+                toast.error("验证已过期，请重新验证");
+              }}
+              onError={() => {
+                setTurnstileToken("");
+                toast.error("验证服务不可用，请稍后再试");
+              }}
+            />
             <label>
               密码
               <input type="password" placeholder="字母+数字，6位以上" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
