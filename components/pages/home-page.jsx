@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   FaChartLine,
@@ -73,13 +72,7 @@ function StatCard({ icon: Icon, label, value, delay }) {
 }
 
 export default function HomePage({ latestPosts = [], stats = {} }) {
-  const [heroReady, setHeroReady] = useState(false);
   const uptimeDays = formatUptimeDays();
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => setHeroReady(true), 700);
-    return () => window.clearTimeout(timer);
-  }, []);
 
   return (
     <PageWrapper>
@@ -88,30 +81,10 @@ export default function HomePage({ latestPosts = [], stats = {} }) {
           <div className={styles.heroCenterer}>
             <div className={styles.heroContent}>
               <motion.div className={styles.heroText} variants={titleVariants} initial="hidden" animate="show">
-                <div className={styles.heroBadge}>
-                  <span className={styles.pulse}></span>
-                  Explore the edge of code
-                </div>
                 <h1 className={styles.heroTitle}>
                   欢迎来到 <span className={styles.accentText}>Aurora</span> 空间
                 </h1>
-                <p className={styles.heroSubtitle}>
-                  这里记录开发、部署、工具链和长期维护中的真实经验。不是模板站，而是一套持续迭代的工程现场。
-                </p>
               </motion.div>
-
-              <div className={styles.heroActions}>
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={heroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }} transition={{ duration: 0.45 }}>
-                  <Link href="/blog">
-                    <button className={`${styles.heroButton} ${styles.primary}`}>开始阅读</button>
-                  </Link>
-                </motion.div>
-                <motion.div initial={{ opacity: 0, y: 20 }} animate={heroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }} transition={{ duration: 0.45, delay: 0.14 }}>
-                  <Link href="/about">
-                    <button className={`${styles.heroButton} ${styles.secondary}`}>关于作者</button>
-                  </Link>
-                </motion.div>
-              </div>
             </div>
           </div>
           <div className={styles.auroraEffect}></div>
