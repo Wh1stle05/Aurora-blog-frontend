@@ -1,0 +1,311 @@
+.profileCard {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2.5rem;
+  border-radius: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.avatarSection {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.mainAvatar {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: var(--input-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.mainAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cameraBtn {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.mainAvatar:hover .cameraBtn {
+  opacity: 1;
+}
+
+.userBrief h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.2rem;
+  color: var(--text-color);
+}
+
+.infoGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.infoLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.infoValue {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--input-bg);
+  padding: 1rem 1.5rem;
+  border-radius: 16px;
+  border: 1px solid var(--glass-border);
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.editBtn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.editBtn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+
+.modal {
+  width: 100%;
+  max-width: 440px;
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeader {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--glass-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.modalBody {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.warningText {
+  color: var(--danger);
+  font-size: 0.85rem;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 10px 15px;
+  border-radius: 10px;
+  border-left: 4px solid var(--danger);
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.inputGroup label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.inputGroup input {
+  padding: 12px 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  background: var(--input-bg);
+  color: var(--text-color);
+  font-size: 1rem;
+  outline: none;
+  transition: var(--transition);
+}
+
+.inputGroup input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+.codeRow {
+  display: flex;
+  gap: 10px;
+}
+
+.codeRow input {
+  flex: 1;
+}
+
+.modalFooter {
+  padding: 1.5rem 2rem;
+  background: var(--input-bg);
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+/* History Modal Specific */
+.historyModal {
+  max-width: 600px;
+}
+
+.tabContainer {
+  display: flex;
+  gap: 1rem;
+}
+
+.tabContainer button {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-weight: 600;
+  cursor: pointer;
+  padding: 5px 0;
+  border-bottom: 2px solid transparent;
+  transition: var(--transition);
+}
+
+.tabContainer button.activeTab {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.historyList {
+  max-height: 400px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.historyItem {
+  background: var(--input-bg);
+  padding: 1rem;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+}
+
+.historyTime {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.historyChange {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+}
+
+.oldVal {
+  color: var(--text-muted);
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.newVal {
+  color: var(--accent);
+}
+
+.arrow {
+  color: var(--text-muted);
+}
+
+/* Crop Modal */
+.cropModal {
+  padding: 2rem;
+  border-radius: 24px;
+  width: auto;
+  max-width: 90vw;
+  text-align: center;
+}
+
+.cropContainer {
+  margin: 1.5rem 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #000;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+  .avatarSection {
+    flex-direction: column;
+  }
+  .infoValue {
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .editBtn {
+    width: 100%;
+  }
+}
