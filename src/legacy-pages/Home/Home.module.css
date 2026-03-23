@@ -158,8 +158,8 @@
 }
 
 .secondContainer {
-  max-width: 100%;
-  width: 100%;
+  max-width: 70%;
+  width: 70%;
 }
 
 .mainGrid {
@@ -400,6 +400,10 @@
 }
 
 @media (max-width: 1024px) {
+  .secondContainer {
+    max-width: 88%;
+    width: 88%;
+  }
   .mainGrid {
     grid-template-columns: 1fr;
   }
@@ -414,6 +418,7 @@
 @media (max-width: 768px) {
   .secondContainer {
     max-width: 95%;
+    width: 95%;
   }
   .heroSection {
     height: auto;

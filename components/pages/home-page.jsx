@@ -6,8 +6,8 @@ import { motion } from 'framer-motion';
 import {
   FaChartLine,
   FaCode,
-  FaDatabase,
   FaDocker,
+  FaPython,
   FaReact,
   FaRocket,
   FaServer,
@@ -35,18 +35,13 @@ const titleVariants = {
 
 const techStack = [
   { icon: FaReact, name: 'React', color: '#61dafb' },
-  { icon: SiVite, name: 'Vite', color: '#facc15' },
-  { icon: SiFastapi, name: 'FastAPI', color: '#10b981' },
-  { icon: FaDocker, name: 'Docker', color: '#38bdf8' },
-  { icon: SiPostgresql, name: 'PostgreSQL', color: '#60a5fa' },
-  { icon: SiTypescript, name: 'TypeScript', color: '#3b82f6' },
-];
-
-const miniStats = [
-  { icon: FaCode, label: '文章', key: 'posts' },
-  { icon: FaChartLine, label: '阅读', key: 'views' },
-  { icon: FaThumbsUp, label: '点赞', key: 'likes' },
-  { icon: FaRocket, label: '运行', key: 'uptime' },
+  { icon: SiTypescript, name: 'TS', color: '#3178C6' },
+  { icon: SiVite, name: 'Vite', color: '#646CFF' },
+  { icon: SiFastapi, name: 'FastAPI', color: '#05998B' },
+  { icon: FaPython, name: 'Python', color: '#3776AB' },
+  { icon: SiPostgresql, name: 'Postgres', color: '#4169E1' },
+  { icon: FaDocker, name: 'Docker', color: '#2496ED' },
+  { icon: FaServer, name: 'Linux', color: '#FCC624' },
 ];
 
 function TechIcon({ icon: Icon, name, color }) {
@@ -82,16 +77,9 @@ export default function HomePage({ latestPosts = [], stats = {} }) {
   const uptimeDays = formatUptimeDays();
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setHeroReady(true), 160);
+    const timer = window.setTimeout(() => setHeroReady(true), 700);
     return () => window.clearTimeout(timer);
   }, []);
-
-  const statValues = {
-    posts: stats.posts || 0,
-    views: stats.views || 0,
-    likes: stats.likes || 0,
-    uptime: `${uptimeDays}d`,
-  };
 
   return (
     <PageWrapper>
@@ -130,7 +118,7 @@ export default function HomePage({ latestPosts = [], stats = {} }) {
         </div>
 
         <div className={styles.secondContainerWrapper}>
-          <PageContainer className={styles.secondContainer} style={{ maxWidth: '100%', width: '100%' }}>
+          <PageContainer className={styles.secondContainer}>
             <div className={styles.mainGrid}>
               <section className={styles.latestSection}>
                 <div className={styles.sectionHeader}>
@@ -183,30 +171,18 @@ export default function HomePage({ latestPosts = [], stats = {} }) {
                   </motion.div>
 
                   <motion.div whileHover={{ y: -5, borderColor: 'rgba(59, 130, 246, 0.4)' }} className={`glass blur ${styles.sideCard}`}>
-                    <h3 className={styles.sideTitle}>站点定位</h3>
-                    <div className={styles.aboutCopy}>
-                      <p>专注工程实现，而不是泛泛而谈。每篇文章都围绕真实问题、部署取舍和可复用的解决方案展开。</p>
-                      <p>前台内容面向公开阅读，后台继续承担发布、审核、历史修订和资源管理。</p>
+                    <h3 className={styles.sideTitle}><FaTerminal /> 关于我</h3>
+                    <div className={styles.aboutText}>
+                      <p>这里是我的博客，记录着技术学习和感悟。</p>
                     </div>
                   </motion.div>
                 </div>
 
                 <div className={styles.statsGrid}>
-                  {miniStats.map((item, index) => (
-                    <StatCard
-                      key={item.key}
-                      icon={item.icon}
-                      label={item.label}
-                      value={statValues[item.key]}
-                      delay={index * 0.08}
-                    />
-                  ))}
-                </div>
-
-                <div className={`glass blur ${styles.featurePanel}`}>
-                  <div className={styles.featureItem}><FaTerminal /> 从本地开发到生产部署，保持一条清晰的工程链路</div>
-                  <div className={styles.featureItem}><FaServer /> API、对象存储、前端静态站点分别解耦部署</div>
-                  <div className={styles.featureItem}><FaDatabase /> 内容、版本和媒体资源按生产环境形态组织</div>
+                  <StatCard icon={FaTerminal} label="文章总数" value={stats.posts || 0} delay={0.1} />
+                  <StatCard icon={FaChartLine} label="全站阅读" value={stats.views || 0} delay={0.2} />
+                  <StatCard icon={FaThumbsUp} label="获得点赞" value={stats.likes || 0} delay={0.3} />
+                  <StatCard icon={FaRocket} label="运行时间" value={uptimeDays} delay={0.4} />
                 </div>
               </section>
             </div>

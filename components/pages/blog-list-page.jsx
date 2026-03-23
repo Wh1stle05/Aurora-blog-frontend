@@ -123,8 +123,8 @@ export default function BlogListPage({ initialPosts, initialTags, initialPageSiz
 
   const listVariants = {
     enter: (dir) => ({ x: dir > 0 ? 100 : dir < 0 ? -100 : 0, opacity: 0 }),
-    center: { x: 0, opacity: 1, transition: { duration: 0.25, ease: 'easeOut' } },
-    exit: (dir) => ({ x: dir > 0 ? -100 : dir < 0 ? 100 : 0, opacity: 0, transition: { duration: 0.2, ease: 'easeIn' } }),
+    center: { x: 0, opacity: 1, transition: { duration: 0.38, ease: 'easeOut' } },
+    exit: (dir) => ({ x: dir > 0 ? -100 : dir < 0 ? 100 : 0, opacity: 0, transition: { duration: 0.3, ease: 'easeIn' } }),
   };
 
   return (
