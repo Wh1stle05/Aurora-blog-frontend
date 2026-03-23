@@ -92,7 +92,7 @@ export default function HomePage({ latestPosts = [], stats = {} }) {
                   欢迎来到 <span className={styles.accentText}>Aurora</span> 空间
                 </h1>
               </motion.div>
-              <div className={styles.heroActions}>
+              <div data-testid="hero-actions" className={styles.heroActions}>
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={heroReady ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }} transition={{ duration: 0.45 }}>
                   <Link href="/blog">
                     <button className={`${styles.heroButton} ${styles.primary}`}>开始阅读</button>

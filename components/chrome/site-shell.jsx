@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -17,6 +17,11 @@ export function SiteShell({ children }) {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const { user, setUser, logout, loading } = useAuth();
   const { theme, toggleTheme, ready } = useTheme();
+  const hasHydratedRef = useRef(false);
+
+  useEffect(() => {
+    hasHydratedRef.current = true;
+  }, []);
 
   const handleNavigate = (nextPath) => {
     if (!nextPath || nextPath === pathname) return;
@@ -44,7 +49,7 @@ export function SiteShell({ children }) {
             <motion.div
               key={pathname}
               className="page-transition-wrapper"
-              initial={{ opacity: 0, y: 18, filter: 'blur(8px)' }}
+              initial={hasHydratedRef.current ? { opacity: 0, y: 18, filter: 'blur(8px)' } : false}
               animate={{
                 opacity: 1,
                 y: 0,
