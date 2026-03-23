@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname, useRouter } from 'next/navigation';
 
@@ -8,7 +8,6 @@ import Header from './header.jsx';
 import Footer from './footer.jsx';
 import AuthModal from '../../src/components/features/auth/AuthModal.jsx';
 import PageSkeleton from '../../src/components/layout/PageSkeleton/PageSkeleton.jsx';
-import { BlogListLoadingShell } from '../pages/blog-list-page.jsx';
 import { useAuth } from '../../src/context/useAuth.js';
 import { useTheme } from '../providers/theme-provider.jsx';
 
@@ -16,47 +15,16 @@ export function SiteShell({ children }) {
   const router = useRouter();
   const pathname = usePathname();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const [isRouteLoading, setIsRouteLoading] = useState(false);
-  const [pendingPath, setPendingPath] = useState(null);
   const { user, setUser, logout, loading } = useAuth();
   const { theme, toggleTheme, ready } = useTheme();
-  const navigateTimerRef = useRef(null);
-  const revealTimerRef = useRef(null);
-
-  useEffect(() => {
-    return () => {
-      if (navigateTimerRef.current) window.clearTimeout(navigateTimerRef.current);
-      if (revealTimerRef.current) window.clearTimeout(revealTimerRef.current);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!pendingPath || pathname !== pendingPath) return;
-    if (revealTimerRef.current) window.clearTimeout(revealTimerRef.current);
-    revealTimerRef.current = window.setTimeout(() => {
-      setIsRouteLoading(false);
-      setPendingPath(null);
-    }, 150);
-  }, [pathname, pendingPath]);
 
   const handleNavigate = (nextPath) => {
-    if (!nextPath || nextPath === pathname || pendingPath === nextPath) return;
-    if (navigateTimerRef.current) window.clearTimeout(navigateTimerRef.current);
-    if (revealTimerRef.current) window.clearTimeout(revealTimerRef.current);
-
-    setPendingPath(nextPath);
-    setIsRouteLoading(true);
-
-    navigateTimerRef.current = window.setTimeout(() => {
-      window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-      router.push(nextPath);
-    }, 150);
+    if (!nextPath || nextPath === pathname) return;
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+    router.push(nextPath);
   };
 
   const shellLoading = !ready || loading;
-  const routeLoadingFallback = pendingPath === '/blog'
-    ? <BlogListLoadingShell pageSize={5} />
-    : <PageSkeleton message={shellLoading ? '同步站点状态...' : '页面切换中...'} />;
 
   return (
     <div className="app-root">
@@ -67,12 +35,10 @@ export function SiteShell({ children }) {
         user={user}
         onLogout={logout}
         onNavigate={handleNavigate}
-        routeTransitioning={isRouteLoading}
-        transitionTargetPath={pendingPath}
       />
       <main className="page-shell">
-        {shellLoading || isRouteLoading ? (
-          routeLoadingFallback
+        {shellLoading ? (
+          <PageSkeleton message="同步站点状态..." />
         ) : (
           <AnimatePresence mode="wait">
             <motion.div
