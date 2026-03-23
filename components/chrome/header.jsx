@@ -9,7 +9,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import styles from '../../src/components/layout/Header/Header.module.css';
 import { resolveAssetUrl } from '../../lib/assets.js';
 
-export default function Header({ theme, onToggleTheme, onLoginClick, user, onLogout }) {
+export default function Header({ theme, onToggleTheme, onLoginClick, user, onLogout, onNavigate, routeTransitioning = false }) {
   const pathname = usePathname();
   const [hidden, setHidden] = useState(false);
   const [isLogoHovered, setIsLogoHovered] = useState(false);
@@ -22,10 +22,16 @@ export default function Header({ theme, onToggleTheme, onLoginClick, user, onLog
   const lastY = useRef(0);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-  }, [pathname]);
+    if (!routeTransitioning) return;
+    setHidden(false);
+    lastY.current = 0;
+  }, [routeTransitioning]);
 
   useMotionValueEvent(scrollY, 'change', (latest) => {
+    if (routeTransitioning) {
+      lastY.current = latest;
+      return;
+    }
     const diff = latest - lastY.current;
     if (diff > 5 && latest > 150) {
       setHidden(true);
@@ -43,6 +49,22 @@ export default function Header({ theme, onToggleTheme, onLoginClick, user, onLog
   ], []);
 
   const isActive = (path) => pathname === path || (path !== '/' && pathname?.startsWith(path));
+
+  const handleInternalNavigation = (event, path) => {
+    if (!onNavigate) return;
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
+    event.preventDefault();
+    onNavigate(path);
+  };
 
   const getLetterAnimation = (index) => ({
     animate: isLogoHovered
@@ -77,6 +99,7 @@ export default function Header({ theme, onToggleTheme, onLoginClick, user, onLog
             className={styles.logoWrapper}
             onMouseEnter={() => setIsLogoHovered(true)}
             onMouseLeave={() => setIsLogoHovered(false)}
+            onClick={(event) => handleInternalNavigation(event, '/')}
           >
             <div className={styles.logo}>
               {'Aurora'.split('').map((letter, index) => (
@@ -106,7 +129,12 @@ export default function Header({ theme, onToggleTheme, onLoginClick, user, onLog
               {navItems.map((item) => {
                 const active = isActive(item.path);
                 return (
-                  <Link key={item.path} href={item.path} className={`${styles.navButton} ${active ? styles.active : ''}`}>
+                  <Link
+                    key={item.path}
+                    href={item.path}
+                    className={`${styles.navButton} ${active ? styles.active : ''}`}
+                    onClick={(event) => handleInternalNavigation(event, item.path)}
+                  >
                     <span className={styles.navLabel}>{item.label}</span>
                     {active ? (
                       <motion.div

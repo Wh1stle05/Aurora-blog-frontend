@@ -76,10 +76,10 @@ a { color: inherit; text-decoration: none; }
 
 .page-transition-wrapper {
   width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
   min-height: var(--page-min-height);
+  will-change: opacity, transform, filter;
 }
 
 /* Base Glass Effect */
