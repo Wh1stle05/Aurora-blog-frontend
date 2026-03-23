@@ -26,10 +26,10 @@ import styles from '../../src/legacy-pages/Blog/Blog.module.css';
 import { getPosts, getTags } from '../../src/services/blogService.js';
 import { getPostHref } from '../../lib/posts.js';
 
-const SkeletonCard = ({ pageSize }) => (
+export const BlogListSkeleton = ({ pageSize = 5 }) => (
   <motion.div key={`loading-${pageSize}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className={styles.listContainer}>
     {Array.from({ length: pageSize }).map((_, index) => (
-      <div key={`skeleton-${index}`} className={`glass blur ${styles.blogCard}`}>
+      <div data-testid="blog-list-skeleton-card" key={`skeleton-${index}`} className={`glass blur ${styles.blogCard}`}>
         <div className={styles.cardHeader}>
           <div className="skeleton" style={{ height: '38px', width: '50%', borderRadius: '8px' }}></div>
           <div className="skeleton" style={{ height: '24px', width: '15%', borderRadius: '6px' }}></div>
@@ -187,7 +187,7 @@ export default function BlogListPage({ initialPosts, initialTags, initialPageSiz
           <div className={styles.blogList}>
             <AnimatePresence mode="wait" custom={direction}>
               {loading ? (
-                <SkeletonCard pageSize={pageSize} />
+                <BlogListSkeleton pageSize={pageSize} />
               ) : (
                 <motion.div key={`${page}-${search}-${selectedTags.join('-')}-${sortBy}`} custom={direction} variants={listVariants} initial="enter" animate="center" exit="exit" className={styles.listContainer}>
                   {posts.length === 0 ? (
