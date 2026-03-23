@@ -37,7 +37,7 @@ vi.mock('../../src/legacy-pages/Home/uptime.js', () => ({
 }));
 
 test('renders the centered hero title with action buttons while keeping the restored second screen content', () => {
-  render(
+  const { container } = render(
     <HomePage
       latestPosts={[
         {
@@ -56,6 +56,7 @@ test('renders the centered hero title with action buttons while keeping the rest
   expect(screen.getByRole('heading', { name: '欢迎来到 Aurora 空间' })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: '开始阅读' })).toBeInTheDocument();
   expect(screen.getByRole('button', { name: '关于作者' })).toBeInTheDocument();
+  expect(container.querySelector('[data-testid="hero-actions"]')).toBeInTheDocument();
   expect(screen.queryByText('Explore the edge of code')).not.toBeInTheDocument();
   expect(screen.queryByText('这里记录开发、部署、工具链和长期维护中的真实经验。不是模板站，而是一套持续迭代的工程现场。')).not.toBeInTheDocument();
   expect(screen.getByText('关于我')).toBeInTheDocument();

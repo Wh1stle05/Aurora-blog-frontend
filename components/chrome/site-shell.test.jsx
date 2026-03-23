@@ -21,6 +21,21 @@ vi.mock('./footer.jsx', () => ({
   default: () => <footer>footer</footer>,
 }));
 
+vi.mock('framer-motion', () => ({
+  AnimatePresence: ({ children }) => <>{children}</>,
+  motion: new Proxy({}, {
+    get: () => ({ children, initial, animate: _animate, exit: _exit, transition: _transition, ...props }) => (
+      <div
+        data-testid={props.className === 'page-transition-wrapper' ? 'page-transition-wrapper' : undefined}
+        data-initial={typeof initial === 'boolean' ? String(initial) : JSON.stringify(initial)}
+        {...props}
+      >
+        {children}
+      </div>
+    ),
+  }),
+}));
+
 vi.mock('../../src/components/features/auth/AuthModal.jsx', () => ({
   default: () => null,
 }));
@@ -52,4 +67,10 @@ test('navigates immediately without forcing a route skeleton', () => {
   expect(screen.queryByText('页面切换中...')).not.toBeInTheDocument();
   expect(container.querySelectorAll('[data-testid="blog-list-skeleton-card"]').length).toBe(0);
   expect(push).toHaveBeenCalledWith('/blog');
+});
+
+test('disables initial page transition on first render to avoid hydration flash', () => {
+  const { container } = render(<SiteShell><div>page-body</div></SiteShell>);
+
+  expect(container.querySelector('[data-testid="page-transition-wrapper"]')).toHaveAttribute('data-initial', 'false');
 });
