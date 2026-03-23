@@ -24,10 +24,11 @@ vi.mock('./footer.jsx', () => ({
 vi.mock('framer-motion', () => ({
   AnimatePresence: ({ children }) => <>{children}</>,
   motion: new Proxy({}, {
-    get: () => ({ children, initial, animate: _animate, exit: _exit, transition: _transition, ...props }) => (
+    get: () => ({ children, initial, animate, exit: _exit, transition: _transition, ...props }) => (
       <div
         data-testid={props.className === 'page-transition-wrapper' ? 'page-transition-wrapper' : undefined}
         data-initial={typeof initial === 'boolean' ? String(initial) : JSON.stringify(initial)}
+        data-animate-state={animate?.opacity === 0 ? 'hidden' : 'visible'}
         {...props}
       >
         {children}
@@ -70,7 +71,9 @@ test('navigates immediately without forcing a route skeleton', () => {
 });
 
 test('disables initial page transition on first render to avoid hydration flash', () => {
+  window.requestAnimationFrame = vi.fn(() => 1);
+  window.cancelAnimationFrame = vi.fn();
   const { container } = render(<SiteShell><div>page-body</div></SiteShell>);
 
-  expect(container.querySelector('[data-testid="page-transition-wrapper"]')).toHaveAttribute('data-initial', 'false');
+  expect(container.querySelector('[data-testid="page-transition-wrapper"]')).toHaveAttribute('data-animate-state', 'hidden');
 });
