@@ -46,15 +46,13 @@ export function SiteShell({ children }) {
   const pageContent = (
     <motion.div
       key={pathname}
-      className="page-transition-wrapper"
-      initial={enteringCurrentPath ? { opacity: 0, y: 20, filter: 'blur(8px)' } : false}
+      className={`page-transition-wrapper${enteringCurrentPath ? ' page-transition-enter' : ''}`}
+      initial={false}
       animate={{
         opacity: 1,
         y: 0,
         filter: 'blur(0px)',
-        transition: enteringCurrentPath
-          ? { type: 'spring', stiffness: 260, damping: 25 }
-          : { duration: 0 },
+        transition: { duration: 0 },
       }}
       onAnimationComplete={enteringCurrentPath ? () => setEnterPath(null) : undefined}
     >

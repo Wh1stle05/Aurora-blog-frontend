@@ -34,7 +34,7 @@ vi.mock('framer-motion', () => ({
   motion: new Proxy({}, {
     get: () => ({ children, initial, animate, exit: _exit, transition: _transition, onAnimationComplete, ...props }) => (
       <div
-        data-testid={props.className === 'page-transition-wrapper' ? 'page-transition-wrapper' : undefined}
+        data-testid={typeof props.className === 'string' && props.className.includes('page-transition-wrapper') ? 'page-transition-wrapper' : undefined}
         data-initial={typeof initial === 'boolean' ? String(initial) : JSON.stringify(initial)}
         data-animate-state={animate?.opacity === 0 ? 'hidden' : 'visible'}
         onAnimationEnd={onAnimationComplete}
@@ -101,14 +101,12 @@ test('keeps the outer page wrapper for enter animation without removing it after
 
   const wrapper = screen.getByTestId('page-transition-wrapper');
   expect(wrapper).toHaveTextContent('blog-body');
-  expect(wrapper).toHaveAttribute(
-    'data-initial',
-    JSON.stringify({ opacity: 0, y: 20, filter: 'blur(8px)' }),
-  );
-  expect(wrapper).toHaveAttribute('data-animate-state', 'visible');
+  expect(wrapper).toHaveAttribute('data-initial', 'false');
+  expect(wrapper.className).toContain('page-transition-enter');
 
   fireEvent.animationEnd(wrapper);
 
   expect(screen.getByTestId('page-transition-wrapper')).toHaveTextContent('blog-body');
   expect(screen.getByTestId('page-transition-wrapper')).toHaveAttribute('data-initial', 'false');
+  expect(screen.getByTestId('page-transition-wrapper').className).not.toContain('page-transition-enter');
 });

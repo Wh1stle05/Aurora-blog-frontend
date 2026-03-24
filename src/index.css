@@ -83,6 +83,23 @@ a { color: inherit; text-decoration: none; }
   min-height: var(--page-min-height);
 }
 
+.page-transition-enter {
+  animation: pageEnterFloat 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes pageEnterFloat {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0px);
+  }
+}
+
 /* Base Glass Effect */
 .glass {
   background: var(--glass-bg);
