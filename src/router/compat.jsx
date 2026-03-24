@@ -32,7 +32,7 @@ export function RouteNavigationProvider({ children, navigate, pendingPath = null
   return <RouteNavigationContext.Provider value={value}>{children}</RouteNavigationContext.Provider>;
 }
 
-export function Link({ to, onClick, children, target, ...props }) {
+export function Link({ to, onClick, children, target, managedNavigation = false, ...props }) {
   const href = normalizeTo(to);
   const { navigate } = useContext(RouteNavigationContext);
 
@@ -48,6 +48,7 @@ export function Link({ to, onClick, children, target, ...props }) {
     onClick?.(event);
     if (
       event.defaultPrevented ||
+      !managedNavigation ||
       !navigate ||
       target === '_blank' ||
       event.button !== 0 ||
@@ -76,7 +77,7 @@ export function NavLink({ to, className, children, ...props }) {
   const resolvedChildren = typeof children === 'function' ? children({ isActive }) : children;
 
   return (
-    <Link to={href} className={resolvedClassName} {...props}>
+    <Link to={href} managedNavigation className={resolvedClassName} {...props}>
       {resolvedChildren}
     </Link>
   );

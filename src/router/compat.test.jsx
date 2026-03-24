@@ -2,7 +2,7 @@ import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { expect, test, vi } from 'vitest';
 
-import { Link, RouteNavigationProvider } from './compat.jsx';
+import { Link, NavLink, RouteNavigationProvider } from './compat.jsx';
 
 const nextLinkSpy = vi.fn();
 
@@ -23,13 +23,13 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), replace: vi.fn() }),
 }));
 
-test('Link disables next prefetch and delegates navigation through provider', () => {
+test('Link disables next prefetch and does not delegate navigation by default', () => {
   const navigate = vi.fn();
   nextLinkSpy.mockClear();
 
   render(
     <RouteNavigationProvider navigate={navigate}>
-      <Link to="/blog/test-post">go</Link>
+      <Link to="/blog/test-post" onClick={(event) => event.preventDefault()}>go</Link>
     </RouteNavigationProvider>,
   );
 
@@ -39,5 +39,20 @@ test('Link disables next prefetch and delegates navigation through provider', ()
     href: '/blog/test-post',
     prefetch: false,
   }));
-  expect(navigate).toHaveBeenCalledWith('/blog/test-post');
+  expect(navigate).not.toHaveBeenCalled();
+});
+
+test('NavLink delegates navigation through provider for animated top-level routes', () => {
+  const navigate = vi.fn();
+  nextLinkSpy.mockClear();
+
+  render(
+    <RouteNavigationProvider navigate={navigate}>
+      <NavLink to="/blog">blog</NavLink>
+    </RouteNavigationProvider>,
+  );
+
+  fireEvent.click(screen.getByRole('link', { name: 'blog' }));
+
+  expect(navigate).toHaveBeenCalledWith('/blog');
 });
