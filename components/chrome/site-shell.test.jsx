@@ -5,10 +5,11 @@ import { beforeEach, expect, test, vi } from 'vitest';
 import { SiteShell } from './site-shell.jsx';
 
 const push = vi.fn();
+const refresh = vi.fn();
 let currentPathname = '/';
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push }),
+  useRouter: () => ({ push, refresh }),
   usePathname: () => currentPathname,
 }));
 
@@ -70,6 +71,7 @@ vi.mock('../providers/theme-provider.jsx', () => ({
 beforeEach(() => {
   currentPathname = '/';
   push.mockReset();
+  refresh.mockReset();
 });
 
 test('starts route transition first and only pushes after exit completes', () => {
@@ -85,6 +87,7 @@ test('starts route transition first and only pushes after exit completes', () =>
   fireEvent.animationEnd(screen.getByTestId('page-transition-wrapper'));
 
   expect(push).toHaveBeenCalledWith('/blog');
+  expect(refresh).not.toHaveBeenCalled();
 });
 
 test('keeps the outer page wrapper for enter animation without removing it after completion', () => {
@@ -109,4 +112,5 @@ test('keeps the outer page wrapper for enter animation without removing it after
   expect(screen.getByTestId('page-transition-wrapper')).toHaveTextContent('blog-body');
   expect(screen.getByTestId('page-transition-wrapper')).toHaveAttribute('data-initial', 'false');
   expect(screen.getByTestId('page-transition-wrapper').className).not.toContain('page-transition-enter');
+  expect(refresh).toHaveBeenCalledTimes(1);
 });
