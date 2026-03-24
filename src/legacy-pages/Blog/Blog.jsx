@@ -69,12 +69,18 @@ export default function Blog({ initialPosts = [], initialTags = [], initialPage 
   }, [availableTags.length]);
 
   useEffect(() => {
-    const hasChanged = page !== initialPage || pageSize !== initialPageSize || search || selectedTags.length > 0 || sortBy !== 'created_at';
-    if (!hasChanged) {
-      setPosts(initialPosts);
-      setTotalPages(initialTotalPages);
-      return;
-    }
+    // Synchronize state when initial props change (e.g., during Next.js navigation)
+    setPosts(initialPosts);
+    setPage(initialPage);
+    setPageSize(initialPageSize);
+    setTotalPages(initialTotalPages);
+    setLoading(false);
+  }, [initialPosts, initialPage, initialPageSize, initialTotalPages]);
+
+  useEffect(() => {
+    // Only fetch client-side if filters have actually changed from their initial values
+    const filtersActive = search || selectedTags.length > 0 || sortBy !== 'created_at' || page !== initialPage || pageSize !== initialPageSize;
+    if (!filtersActive) return;
 
     setLoading(true);
     const delayDebounceFn = window.setTimeout(() => {
@@ -89,7 +95,7 @@ export default function Blog({ initialPosts = [], initialTags = [], initialPage 
     }, 300);
 
     return () => window.clearTimeout(delayDebounceFn);
-  }, [initialPage, initialPageSize, initialPosts, initialTotalPages, page, pageSize, search, selectedTags, sortBy]);
+  }, [page, pageSize, search, selectedTags, sortBy, initialPage, initialPageSize]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -195,18 +201,33 @@ export default function Blog({ initialPosts = [], initialTags = [], initialPage 
           </div>
 
           <div className={styles.blogList}>
-            <AnimatePresence mode="wait" custom={direction}>
+            <AnimatePresence mode="popLayout" custom={direction}>
               {loading ? (
-                <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className={styles.listContainer}>
+                <motion.div 
+                  key="loading" 
+                  initial={{ opacity: 0 }} 
+                  animate={{ opacity: 1 }} 
+                  exit={{ opacity: 0 }} 
+                  className={styles.listContainer}
+                  transition={{ duration: 0.2 }}
+                >
                   {Array.from({ length: pageSize }).map((_, i) => <SkeletonCard key={`skeleton-${i}`} />)}
                 </motion.div>
               ) : (
-                <motion.div key={`${page}-${search}-${selectedTags.join('-')}-${sortBy}`} custom={direction} variants={listVariants} initial="enter" animate="center" exit="exit" className={styles.listContainer}>
+                <motion.div 
+                  key={`${page}-${search}-${selectedTags.join('-')}-${sortBy}`} 
+                  custom={direction} 
+                  variants={listVariants} 
+                  initial="enter" 
+                  animate="center" 
+                  exit="exit" 
+                  className={styles.listContainer}
+                >
                   {posts.length === 0 ? (
                     <div className={styles.noResults}>未找到相关文章</div>
                   ) : (
                     posts.map((post) => (
-                      <motion.div key={post.id} whileHover="hover" variants={itemVariants}>
+                      <motion.div key={post.id} whileHover="hover" variants={itemVariants} layout>
                         <Link to={getPostHref(post)} className={`glass blur ${styles.blogCard}`}>
                           <div className={styles.cardHeader}>
                             <h2 className={styles.postTitle}>{post.title}</h2>

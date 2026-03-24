@@ -122,19 +122,18 @@ function BlogDetail({ initialPost = null, routeParam = null }) {
   useEffect(() => {
     setPost(initialPost);
     setLoading(!initialPost);
-    hasIncrementedView.current = false;
+    hasIncrementedView.current = initialPost ? true : false;
   }, [id, initialPost]);
 
   useEffect(() => {
-    if (!hasIncrementedView.current) {
+    if (loading || !id) return;
+
+    // Only fetch if we don't have the post yet
+    if (!post && !hasIncrementedView.current) {
       hasIncrementedView.current = true;
-      if (!initialPost) {
-        loadPost(false);
-      }
-    } else {
-      loadPost(true);
+      loadPost(false);
     }
-  }, [id, initialPost, loadPost]);
+  }, [id, post, loading, loadPost]);
 
   const handleReact = async (value) => {
     try {

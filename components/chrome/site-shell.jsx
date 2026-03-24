@@ -24,43 +24,28 @@ export function SiteShell({ children }) {
 
   useEffect(() => {
     if (transitionTargetPath !== pathname) return;
-    router.refresh();
     setTransitionTargetPath(null);
     setRouteTransitioning(false);
-  }, [pathname, router, transitionTargetPath]);
+  }, [pathname, transitionTargetPath]);
 
   const handleNavigate = (nextPath) => {
-    if (!nextPath || nextPath === pathname || routeTransitioning) return;
+    if (!nextPath || nextPath === pathname) return;
+    // Allow interrupting existing transition if it's a different target
+    if (routeTransitioning && nextPath === transitionTargetPath) return;
+    
     setTransitionTargetPath(nextPath);
     setRouteTransitioning(true);
   };
 
   const handleExitComplete = () => {
-    if (!routeTransitioning || !transitionTargetPath || enterPath === transitionTargetPath) return;
+    if (!routeTransitioning || !transitionTargetPath) return;
     setEnterPath(transitionTargetPath);
     router.push(transitionTargetPath);
   };
 
   const shellLoading = !ready || loading;
   const enteringCurrentPath = enterPath === pathname;
-  const showingExitTransition = routeTransitioning && !enteringCurrentPath;
-  const pageContent = (
-    <motion.div
-      key={pathname}
-      className={`page-transition-wrapper${enteringCurrentPath ? ' page-transition-enter' : ''}`}
-      initial={false}
-      animate={{
-        opacity: 1,
-        y: 0,
-        filter: 'blur(0px)',
-        transition: { duration: 0 },
-      }}
-      onAnimationComplete={enteringCurrentPath ? () => setEnterPath(null) : undefined}
-    >
-      {children}
-    </motion.div>
-  );
-
+  
   return (
     <RouteNavigationProvider navigate={handleNavigate} pendingPath={transitionTargetPath}>
       <div className="app-root">
@@ -77,22 +62,33 @@ export function SiteShell({ children }) {
         <main className="page-shell">
           {shellLoading ? (
             <PageSkeleton message="同步站点状态..." />
-          ) : showingExitTransition ? (
-            <motion.div
-              className="page-transition-wrapper"
-              initial={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-              animate={{
-                opacity: 0,
-                y: -16,
-                filter: 'blur(8px)',
-                transition: { duration: 0.24, ease: 'easeInOut' },
-              }}
-              onAnimationComplete={handleExitComplete}
-            >
-              {children}
-            </motion.div>
           ) : (
-            pageContent
+            <AnimatePresence mode="wait" onExitComplete={handleExitComplete}>
+              {!routeTransitioning ? (
+                <motion.div
+                  key={pathname}
+                  className="page-transition-wrapper"
+                  initial={enteringCurrentPath ? { opacity: 0, y: 10, filter: 'blur(4px)' } : false}
+                  animate={{ 
+                    opacity: 1, 
+                    y: 0, 
+                    filter: 'blur(0px)',
+                    transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] } 
+                  }}
+                  exit={{ 
+                    opacity: 0, 
+                    y: -12, 
+                    filter: 'blur(4px)',
+                    transition: { duration: 0.2, ease: 'easeInOut' } 
+                  }}
+                  onAnimationComplete={() => {
+                    if (enteringCurrentPath) setEnterPath(null);
+                  }}
+                >
+                  {children}
+                </motion.div>
+              ) : null}
+            </AnimatePresence>
           )}
         </main>
         <Footer />
