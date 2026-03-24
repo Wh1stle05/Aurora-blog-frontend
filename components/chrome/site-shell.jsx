@@ -24,9 +24,10 @@ export function SiteShell({ children }) {
 
   useEffect(() => {
     if (transitionTargetPath !== pathname) return;
+    router.refresh();
     setTransitionTargetPath(null);
     setRouteTransitioning(false);
-  }, [pathname, transitionTargetPath]);
+  }, [pathname, router, transitionTargetPath]);
 
   const handleNavigate = (nextPath) => {
     if (!nextPath || nextPath === pathname || routeTransitioning) return;

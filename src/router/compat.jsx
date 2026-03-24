@@ -60,7 +60,7 @@ export function Link({ to, onClick, children, target, ...props }) {
   };
 
   return (
-    <NextLink href={href} onClick={handleClick} target={target} {...props}>
+    <NextLink href={href} prefetch={false} onClick={handleClick} target={target} {...props}>
       {children}
     </NextLink>
   );
