@@ -5,8 +5,9 @@ import { useToast } from "../../../context/useToast.js";
 import Modal from "../../common/Modal/Modal.jsx";
 import TurnstileWidget from "../../common/TurnstileWidget.jsx";
 import { apiUrl } from '../../../utils/api.js';
+import { PUBLIC_TURNSTILE_SITE_KEY } from '../../../../lib/env.js';
 
-const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY || "";
+const TURNSTILE_SITE_KEY = PUBLIC_TURNSTILE_SITE_KEY;
 
 export default function AuthModal({ onClose, onAuth }) {
   const [mode, setMode] = useState("login");

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { NavLink, Link, useLocation } from 'react-router-dom';
+import { NavLink, Link, useLocation } from '../../../router/compat.jsx';
 import styles from './Header.module.css';
 import { FaGithub, FaSun, FaMoon, FaUser, FaSignOutAlt } from 'react-icons/fa';
 import { motion, useScroll, useMotionValueEvent, LayoutGroup, useSpring } from 'framer-motion';
@@ -155,7 +155,7 @@ const Header = ({ theme, onToggleTheme, onLoginClick, user, onLogout }) => {
               </button>
             )}
 
-            <a href="https://github.com/Wh1stle05/Aurora-Blog" target="_blank" rel="noopener noreferrer" className="icon-btn" title="GitHub 仓库">
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="icon-btn" title="GitHub 仓库">
               <FaGithub />
             </a>
           </div>

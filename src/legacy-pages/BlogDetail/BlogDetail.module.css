@@ -1,0 +1,265 @@
+.detailCard {
+  padding: 4rem;
+  border-radius: 24px;
+}
+
+.backBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin-bottom: 2rem;
+  transition: var(--transition);
+}
+
+.backBtn:hover {
+  color: var(--accent);
+  transform: translateX(-5px);
+}
+
+.header {
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  letter-spacing: -1px;
+}
+
+.meta {
+  display: flex;
+  gap: 24px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+
+.tags {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-muted);
+}
+
+.tagBadge {
+  padding: 4px 12px;
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--accent);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.meta span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.content {
+  line-height: 1.8;
+  font-size: 1.1rem;
+}
+
+/* 代码块美化 */
+.codeBlockContainer {
+  margin: 2rem 0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--code-bg, #1a1b26);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+}
+
+:global([data-theme='light']) .codeBlockContainer {
+  --code-bg: #f8fafc;
+  border-color: rgba(0, 0, 0, 0.05);
+}
+
+:global([data-theme='dark']) .codeBlockContainer {
+  --code-bg: #1a1b26;
+}
+
+.codeHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 1.2rem;
+  background: rgba(128, 128, 128, 0.05);
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.codeLang {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.copyBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--input-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.copyBtn:hover {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.pre {
+  margin: 0 !important;
+  padding: 1.2rem !important;
+  background: transparent !important;
+  font-size: 0.95rem !important;
+  overflow-x: auto;
+}
+
+.pre code {
+  font-family: 'Fira Code', 'Consolas', monospace !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+
+/* 强制覆盖 Prism 可能导致的背景色冲突 */
+.pre,
+.pre code,
+.pre [class*="language-"],
+.pre :global(pre[class*="language-"]),
+.pre :global(code[class*="language-"]) {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.content :global(.token.comment),
+.content :global(.token.prolog),
+.content :global(.token.doctype),
+.content :global(.token.cdata) {
+  color: #94a3b8 !important;
+}
+
+.inlineCode {
+  background: var(--input-bg);
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  color: var(--accent);
+  font-family: monospace;
+}
+
+.postActions {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--glass-border);
+}
+
+.reactBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.8rem 1.5rem;
+  border-radius: 12px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-color);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.reactBtn:hover {
+  background: rgba(99, 102, 241, 0.1);
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.reactBtnActiveLike {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.reactBtnActiveLike:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.reactBtnActiveDislike {
+  background: rgba(156, 163, 175, 0.1);
+  border-color: #9ca3af;
+  color: #9ca3af;
+}
+
+.reactBtnActiveDislike:hover {
+  background: rgba(156, 163, 175, 0.15);
+  border-color: #9ca3af;
+  color: #9ca3af;
+}
+
+/* Lightbox Styles */
+.imageOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(10px);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+  padding: 40px;
+}
+
+.zoomedImage {
+  max-width: 95%;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  cursor: default;
+}
+
+.overlayClose {
+  margin-top: 20px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+}
+
+@media (max-width: 768px) {
+  .detailCard {
+    padding: 2rem;
+  }
+  .title {
+    font-size: 1.8rem;
+  }
+}
