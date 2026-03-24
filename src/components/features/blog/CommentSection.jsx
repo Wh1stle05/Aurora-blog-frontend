@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { getComments, createComment, reactComment, deleteComment } from '../../../services/blogService';
 import styles from './CommentSection.module.css';
 import { FaUser, FaReply, FaThumbsUp, FaThumbsDown, FaTrash } from 'react-icons/fa';
+import TurnstileChallengeModal from '../../common/TurnstileChallengeModal.jsx';
 import { useToast } from '../../../context/useToast.js';
 
 const CommentItem = ({ comment, depth = 0, onReply, onReact, onDelete, currentUser }) => {
@@ -137,6 +138,8 @@ export default function CommentSection({ postId }) {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const [pendingComment, setPendingComment] = useState(null);
   const [error, setError] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
   const toast = useToast();
@@ -180,28 +183,39 @@ export default function CommentSection({ postId }) {
   const handleMainSubmit = async (e) => {
     e.preventDefault();
     if (!content.trim()) return;
-    setSubmitting(true);
     setError('');
-    try {
-      await createComment(postId, content);
-      setContent('');
-      loadComments();
-      toast.success('评论发表成功');
-    } catch (err) {
-      setError(err.message || '发表评论失败');
-      toast.error(err.message || '发表评论失败');
-    } finally {
-      setSubmitting(false);
-    }
+    setPendingComment({ parentId: null, content: content.trim() });
+    setShowVerifyModal(true);
   };
 
   const handleReply = async (parentId, text) => {
+    setPendingComment({ parentId, content: text.trim() });
+    setShowVerifyModal(true);
+  };
+
+  const submitVerifiedComment = async (turnstileToken) => {
+    if (!pendingComment?.content) return;
+    setSubmitting(true);
+    setError('');
     try {
-      await createComment(postId, text, parentId);
+      await createComment(postId, pendingComment.content, pendingComment.parentId, turnstileToken);
+      if (pendingComment.parentId) {
+        toast.success('回复发表成功');
+      } else {
+        setContent('');
+        toast.success('评论发表成功');
+      }
+      setPendingComment(null);
+      setShowVerifyModal(false);
       loadComments();
-      toast.success('回复发表成功');
     } catch (err) {
-      toast.error(err.message || '回复失败');
+      const message = err.message || (pendingComment.parentId ? '回复失败' : '发表评论失败');
+      if (!pendingComment.parentId) {
+        setError(message);
+      }
+      toast.error(message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -281,6 +295,13 @@ export default function CommentSection({ postId }) {
           ))
         )}
       </div>
+      <TurnstileChallengeModal
+        open={showVerifyModal}
+        onClose={() => !submitting && setShowVerifyModal(false)}
+        onConfirm={submitVerifiedComment}
+        loading={submitting}
+        confirmLabel="确认发送"
+      />
     </div>
   );
 }

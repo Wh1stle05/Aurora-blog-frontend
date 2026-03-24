@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { FaPaperPlane, FaGithub, FaTwitter, FaEnvelope } from 'react-icons/fa';
 
+import TurnstileChallengeModal from '../../components/common/TurnstileChallengeModal.jsx';
 import Body from '../../components/layout/Body/Body.jsx';
 import PageContainer from '../../components/layout/PageContainer/PageContainer.jsx';
 import PageTitle from '../../components/layout/PageTitle/PageTitle.jsx';
@@ -13,13 +14,12 @@ import styles from './Contact.module.css';
 
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', content: '' });
-  const [status, setStatus] = useState(null);
+  const [sending, setSending] = useState(false);
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
   const toast = useToast();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setStatus('sending');
-
+  const submitContact = async (turnstileToken) => {
+    setSending(true);
     try {
       const res = await fetch(apiUrl('/api/contact'), {
         method: 'POST',
@@ -28,6 +28,7 @@ export default function Contact() {
           nickname: form.name,
           email: form.email,
           content: form.content,
+          turnstile_token: turnstileToken,
         }),
       });
 
@@ -36,14 +37,23 @@ export default function Contact() {
         throw new Error(data.detail || '消息发送失败');
       }
 
-      setStatus('success');
       toast.success('消息已发送！我会尽快回复你。');
       setForm({ name: '', email: '', content: '' });
-      window.setTimeout(() => setStatus(null), 1500);
+      setShowVerifyModal(false);
     } catch (error) {
-      setStatus(null);
       toast.error(error.message || '消息发送失败');
+    } finally {
+      setSending(false);
     }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.name.trim() || !form.email.trim() || !form.content.trim()) {
+      toast.error('请完整填写联系信息');
+      return;
+    }
+    setShowVerifyModal(true);
   };
 
   return (
@@ -101,17 +111,23 @@ export default function Contact() {
                     required
                   />
                 </div>
-                <button className="btn" type="submit" disabled={status === 'sending'}>
-                  {status === 'sending' ? '发送中...' : (
+                <button className="btn" type="submit" disabled={sending}>
+                  {sending ? '发送中...' : (
                     <>
                       <FaPaperPlane /> <span>发送消息</span>
                     </>
                   )}
                 </button>
-                {status === 'success' && <p className={styles.successMsg}>消息已发送！我会尽快回复你。</p>}
               </form>
             </div>
           </div>
+          <TurnstileChallengeModal
+            open={showVerifyModal}
+            onClose={() => !sending && setShowVerifyModal(false)}
+            onConfirm={submitContact}
+            loading={sending}
+            confirmLabel="确认发送"
+          />
         </PageContainer>
       </Body>
     </PageWrapper>

@@ -120,13 +120,21 @@ function BlogDetail({ initialPost = null, routeParam = null }) {
   };
 
   useEffect(() => {
+    setPost(initialPost);
+    setLoading(!initialPost);
+    hasIncrementedView.current = false;
+  }, [id, initialPost]);
+
+  useEffect(() => {
     if (!hasIncrementedView.current) {
-      loadPost(false);
       hasIncrementedView.current = true;
+      if (!initialPost) {
+        loadPost(false);
+      }
     } else {
       loadPost(true);
     }
-  }, [loadPost]);
+  }, [id, initialPost, loadPost]);
 
   const handleReact = async (value) => {
     try {
