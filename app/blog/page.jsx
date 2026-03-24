@@ -11,10 +11,15 @@ export const metadata = buildDefaultMetadata({
 });
 
 export default async function BlogRoute() {
-  const [pageData, tags] = await Promise.all([
+  const [pageResult, tagsResult] = await Promise.allSettled([
     getBlogPage({ page: 1, pageSize: 5 }),
     getTags(),
   ]);
+
+  const pageData = pageResult.status === 'fulfilled'
+    ? pageResult.value
+    : { data: [], page: 1, total_pages: 1 };
+  const tags = tagsResult.status === 'fulfilled' ? tagsResult.value : [];
 
   return (
     <BlogPage
