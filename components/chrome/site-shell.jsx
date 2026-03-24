@@ -18,12 +18,14 @@ export function SiteShell({ children }) {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [routeTransitioning, setRouteTransitioning] = useState(false);
   const [transitionTargetPath, setTransitionTargetPath] = useState(null);
+  const [enterPath, setEnterPath] = useState(null);
   const { user, setUser, logout, loading } = useAuth();
   const { theme, toggleTheme, ready } = useTheme();
 
   useEffect(() => {
-    if (!transitionTargetPath || pathname !== transitionTargetPath) return;
+    if (transitionTargetPath !== pathname) return;
     setTransitionTargetPath(null);
+    setRouteTransitioning(false);
   }, [pathname, transitionTargetPath]);
 
   const handleNavigate = (nextPath) => {
@@ -33,12 +35,32 @@ export function SiteShell({ children }) {
   };
 
   const handleExitComplete = () => {
-    if (!routeTransitioning || !transitionTargetPath) return;
-    setRouteTransitioning(false);
+    if (!routeTransitioning || !transitionTargetPath || enterPath === transitionTargetPath) return;
+    setEnterPath(transitionTargetPath);
     router.push(transitionTargetPath);
   };
 
   const shellLoading = !ready || loading;
+  const enteringCurrentPath = enterPath === pathname;
+  const showingExitTransition = routeTransitioning && !enteringCurrentPath;
+  const pageContent = (
+    <motion.div
+      key={pathname}
+      className="page-transition-wrapper"
+      initial={enteringCurrentPath ? { opacity: 0, y: 20, filter: 'blur(8px)' } : false}
+      animate={{
+        opacity: 1,
+        y: 0,
+        filter: 'blur(0px)',
+        transition: enteringCurrentPath
+          ? { type: 'spring', stiffness: 260, damping: 25 }
+          : { duration: 0 },
+      }}
+      onAnimationComplete={enteringCurrentPath ? () => setEnterPath(null) : undefined}
+    >
+      {children}
+    </motion.div>
+  );
 
   return (
     <RouteNavigationProvider navigate={handleNavigate} pendingPath={transitionTargetPath}>
@@ -56,7 +78,7 @@ export function SiteShell({ children }) {
         <main className="page-shell">
           {shellLoading ? (
             <PageSkeleton message="同步站点状态..." />
-          ) : routeTransitioning ? (
+          ) : showingExitTransition ? (
             <motion.div
               className="page-transition-wrapper"
               initial={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
@@ -71,7 +93,7 @@ export function SiteShell({ children }) {
               {children}
             </motion.div>
           ) : (
-            children
+            pageContent
           )}
         </main>
         <Footer />

@@ -1,14 +1,15 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { expect, test, vi } from 'vitest';
+import { beforeEach, expect, test, vi } from 'vitest';
 
 import { SiteShell } from './site-shell.jsx';
 
 const push = vi.fn();
+let currentPathname = '/';
 
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push }),
-  usePathname: () => '/',
+  usePathname: () => currentPathname,
 }));
 
 vi.mock('../../src/components/layout/Header/Header.jsx', () => ({
@@ -66,9 +67,13 @@ vi.mock('../providers/theme-provider.jsx', () => ({
   }),
 }));
 
+beforeEach(() => {
+  currentPathname = '/';
+  push.mockReset();
+});
+
 test('starts route transition first and only pushes after exit completes', () => {
   const { container } = render(<SiteShell><div>page-body</div></SiteShell>);
-  push.mockReset();
   window.scrollTo = vi.fn();
 
   fireEvent.click(screen.getByRole('button', { name: 'go-blog' }));
@@ -80,4 +85,30 @@ test('starts route transition first and only pushes after exit completes', () =>
   fireEvent.animationEnd(screen.getByTestId('page-transition-wrapper'));
 
   expect(push).toHaveBeenCalledWith('/blog');
+});
+
+test('keeps the outer page wrapper for enter animation without removing it after completion', () => {
+  push.mockImplementation((nextPath) => {
+    currentPathname = nextPath;
+  });
+
+  const { rerender } = render(<SiteShell><div>page-body</div></SiteShell>);
+
+  fireEvent.click(screen.getByRole('button', { name: 'go-blog' }));
+  fireEvent.animationEnd(screen.getByTestId('page-transition-wrapper'));
+
+  rerender(<SiteShell><div>blog-body</div></SiteShell>);
+
+  const wrapper = screen.getByTestId('page-transition-wrapper');
+  expect(wrapper).toHaveTextContent('blog-body');
+  expect(wrapper).toHaveAttribute(
+    'data-initial',
+    JSON.stringify({ opacity: 0, y: 20, filter: 'blur(8px)' }),
+  );
+  expect(wrapper).toHaveAttribute('data-animate-state', 'visible');
+
+  fireEvent.animationEnd(wrapper);
+
+  expect(screen.getByTestId('page-transition-wrapper')).toHaveTextContent('blog-body');
+  expect(screen.getByTestId('page-transition-wrapper')).toHaveAttribute('data-initial', 'false');
 });
