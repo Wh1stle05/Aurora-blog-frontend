@@ -89,11 +89,11 @@ export const getComments = async (postId) => {
 };
 
 // 发表评论
-export const createComment = async (postId, content, parentId = null) => {
+export const createComment = async (postId, content, parentId = null, turnstileToken = '') => {
   try {
     const response = await apiFetch(apiUrl(`/api/posts/${postId}/comments`), {
       method: 'POST',
-      body: JSON.stringify({ content, parent_id: parentId })
+      body: JSON.stringify({ content, parent_id: parentId, turnstile_token: turnstileToken })
     });
 
     const data = await response.json();
