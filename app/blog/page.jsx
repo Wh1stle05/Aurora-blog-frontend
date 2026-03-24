@@ -2,7 +2,7 @@ import BlogPage from '../../components/pages/blog-page-shell.jsx';
 import { getBlogPage, getTags } from '../../lib/posts.js';
 import { buildDefaultMetadata } from '../../lib/seo.js';
 
-export const revalidate = 120;
+export const revalidate = 10;
 export const metadata = buildDefaultMetadata({
   title: '技术博客',
   description: '浏览 Aurora Blog 的公开文章。',

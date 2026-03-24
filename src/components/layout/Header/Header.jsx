@@ -119,6 +119,7 @@ const Header = ({ theme, onToggleTheme, onLoginClick, user, onLogout }) => {
                         <motion.div 
                           layoutId="nav-pill"
                           className={styles.activePill}
+                          initial={false}
                           transition={{ type: "spring", stiffness: 350, damping: 30 }}
                         />
                       )}

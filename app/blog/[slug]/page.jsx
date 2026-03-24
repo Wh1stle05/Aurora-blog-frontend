@@ -4,7 +4,7 @@ import BlogDetailPage from '../../../components/pages/blog-detail-page.jsx';
 import { getPostBySlug } from '../../../lib/posts.js';
 import { buildPostJsonLd, buildPostMetadata } from '../../../lib/seo.js';
 
-export const revalidate = 120;
+export const revalidate = 10;
 
 export async function generateMetadata({ params }) {
   try {
