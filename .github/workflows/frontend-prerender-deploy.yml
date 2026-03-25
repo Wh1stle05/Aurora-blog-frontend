@@ -1,0 +1,50 @@
+name: Frontend Prerender Deploy
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    container:
+      image: node:22-bookworm
+    env:
+      PUPPETEER_SKIP_DOWNLOAD: 'true'
+      PUPPETEER_EXECUTABLE_PATH: /usr/bin/chromium
+      VITE_API_BASE: ${{ vars.VITE_API_BASE }}
+      VITE_SITE_URL: ${{ vars.VITE_SITE_URL }}
+      VITE_ASSET_CDN_BASE: ${{ vars.VITE_ASSET_CDN_BASE }}
+      VITE_TURNSTILE_SITE_KEY: ${{ vars.VITE_TURNSTILE_SITE_KEY }}
+      VITE_SITE_LAUNCH_DATE: ${{ vars.VITE_SITE_LAUNCH_DATE }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y chromium git
+
+      - name: Install npm dependencies
+        run: npm ci --no-fund --no-audit
+
+      - name: Run SEO verification tests
+        run: npm run test:seo
+
+      - name: Build prerendered frontend
+        run: npm run build
+
+      - name: Verify prerender output
+        run: npm run verify:prerender
+
+      - name: Deploy dist to Vercel
+        run: npx vercel deploy dist --prod --yes --token "$VERCEL_TOKEN"
