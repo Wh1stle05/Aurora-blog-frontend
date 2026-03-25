@@ -90,11 +90,6 @@
   border-color: var(--accent);
 }
 
-.successMsg {
-  color: #4caf50;
-  text-align: center;
-  font-weight: 500;
-}
 
 @media (max-width: 860px) {
   .contactGrid {
