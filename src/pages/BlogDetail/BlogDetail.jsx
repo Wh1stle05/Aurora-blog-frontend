@@ -17,9 +17,11 @@ import { FaCalendar, FaUser, FaArrowLeft, FaEye, FaTag, FaThumbsUp, FaThumbsDown
 import { Helmet } from 'react-helmet-async';
 import { resolveAssetUrl } from '../../utils/assets.js';
 import { transformImageUri } from './imageTransform.js';
+import { usePrerenderReady } from '../../hooks/usePrerenderReady.js';
+import { buildArticleJsonLd, buildCanonicalUrl, buildPostPath, buildSeoDescription } from '../../utils/seo.js';
 
 function BlogDetail() {
-  const { id } = useParams();
+  const { slug } = useParams();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(null);
@@ -100,7 +102,7 @@ function BlogDetail() {
   // 删掉之前的全局 highlight useEffect，因为现在由 HighlightedCode 组件自己负责了
 
   const loadPost = useCallback((skipView = false) => {
-    getPost(id, skipView)
+    getPost(slug, skipView)
       .then(data => {
         setPost(data);
         if (window.Prism) {
@@ -109,7 +111,7 @@ function BlogDetail() {
       })
       .catch(err => toast.error(err.message || '获取文章失败'))
       .finally(() => setLoading(false));
-  }, [id, toast]);
+  }, [slug, toast]);
 
   const handleCopy = (code, id) => {
     navigator.clipboard.writeText(code);
@@ -126,6 +128,8 @@ function BlogDetail() {
       loadPost(true);
     }
   }, [loadPost]);
+
+  usePrerenderReady(!loading && !!post);
 
   const handleReact = async (value) => {
     try {
@@ -172,13 +176,26 @@ function BlogDetail() {
 
   if (!post) return <div className="error-msg">文章不存在</div>;
 
+  const canonical = buildCanonicalUrl(buildPostPath(post));
+  const description = buildSeoDescription(post.summary || post.content || '');
+  const jsonLd = buildArticleJsonLd(post);
+
   return (
     <PageWrapper>
       <Helmet>
         <title>{post.title} | Aurora Blog</title>
-        <meta name="description" content={post.content.substring(0, 160)} />
+        <meta name="description" content={description} />
+        <link rel="canonical" href={canonical} />
+        <meta property="og:type" content="article" />
         <meta property="og:title" content={post.title} />
-        <meta property="og:description" content={post.content.substring(0, 160)} />
+        <meta property="og:description" content={description} />
+        <meta property="og:url" content={canonical} />
+        <meta property="og:image" content={resolveAssetUrl(post.cover_image || 'images/background.webp')} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={post.title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={resolveAssetUrl(post.cover_image || 'images/background.webp')} />
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
       <Body>
         <PageContainer>

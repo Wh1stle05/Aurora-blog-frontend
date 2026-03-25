@@ -1,6 +1,11 @@
 import { BACKEND_HOST } from './api.js';
 
-export const CDN_BASE = (import.meta.env.VITE_ASSET_CDN_BASE || '').replace(/\/$/, '');
+const DEFAULT_PROD_CDN_BASE = 'https://cdn.aurorablog.me';
+
+const resolvedCdnBase = import.meta.env.VITE_ASSET_CDN_BASE
+  || (import.meta.env.PROD ? DEFAULT_PROD_CDN_BASE : '');
+
+export const CDN_BASE = resolvedCdnBase.replace(/\/$/, '');
 
 export function resolveAssetUrl(value) {
   if (!value) return value;

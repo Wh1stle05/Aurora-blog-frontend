@@ -8,6 +8,9 @@ import PageWrapper from '../../components/layout/PageWrapper/PageWrapper.jsx';
 import { getPosts, getTags } from '../../services/blogService.js';
 import { Link } from 'react-router-dom';
 import { FaCalendar, FaUser, FaChevronLeft, FaChevronRight, FaSearch, FaTag, FaEye, FaThumbsUp, FaThumbsDown, FaComment, FaSortAmountDown, FaTimes } from 'react-icons/fa';
+import { Helmet } from 'react-helmet-async';
+import { usePrerenderReady } from '../../hooks/usePrerenderReady.js';
+import { buildDefaultMeta, buildPostPath } from '../../utils/seo.js';
 
 const SkeletonCard = () => (
   <div className={`glass blur ${styles.blogCard}`}>
@@ -32,6 +35,8 @@ const SkeletonCard = () => (
 );
 
 function Blog() {
+  const isPrerenderMode = typeof window !== 'undefined'
+    && window.__AURORA_PRERENDER__?.proxyApi;
   const [posts, setPosts] = useState([]);
   const [availableTags, setAvailableTags] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -61,10 +66,10 @@ function Blog() {
         })
         .catch(err => console.error(err))
         .finally(() => setLoading(false));
-    }, 300);
+    }, isPrerenderMode ? 0 : 300);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [page, pageSize, search, selectedTags, sortBy]);
+  }, [isPrerenderMode, page, pageSize, search, selectedTags, sortBy]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -122,9 +127,30 @@ function Blog() {
   const itemVariants = {
     hover: { y: -6, scale: 1.01, transition: { duration: 0.2 } }
   };
+  const meta = buildDefaultMeta({
+    title: '技术博客 | Aurora Blog',
+    description: '浏览 Aurora Blog 的公开文章与技术记录。',
+    path: '/blog',
+  });
+
+  usePrerenderReady(!loading);
 
   return (
     <PageWrapper>
+      <Helmet>
+        <title>{meta.title}</title>
+        <meta name="description" content={meta.description} />
+        <link rel="canonical" href={meta.canonical} />
+        <meta property="og:type" content={meta.type} />
+        <meta property="og:title" content={meta.title} />
+        <meta property="og:description" content={meta.description} />
+        <meta property="og:url" content={meta.canonical} />
+        <meta property="og:image" content={meta.imageUrl} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={meta.title} />
+        <meta name="twitter:description" content={meta.description} />
+        <meta name="twitter:image" content={meta.imageUrl} />
+      </Helmet>
       <Body>
         <PageContainer>
           <PageTitle>技术博客</PageTitle>
@@ -194,7 +220,7 @@ function Blog() {
           
           <div className={styles.blogList}>
             <AnimatePresence mode="wait" custom={direction}>
-              {loading ? (
+              {loading && !(isPrerenderMode && posts.length > 0) ? (
                 <motion.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className={styles.listContainer}>
                   {Array.from({ length: pageSize }).map((_, i) => <SkeletonCard key={`skeleton-${i}`} />)}
                 </motion.div>
@@ -217,7 +243,7 @@ function Blog() {
                         whileHover="hover"
                         variants={itemVariants}
                       >
-                        <Link to={`/blog/${post.id}`} className={`glass blur ${styles.blogCard}`}>
+                        <Link to={buildPostPath(post)} className={`glass blur ${styles.blogCard}`}>
                           <div className={styles.cardHeader}>
                             <h2 className={styles.postTitle}>{post.title}</h2>
                             {post.tags && (
