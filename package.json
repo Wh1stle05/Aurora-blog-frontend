@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/generate-seo-files.js && vite build",
+    "build": "node scripts/generate-seo-files.js && vite build && node scripts/prepare-vercel-static-config.mjs",
     "lint": "eslint .",
     "test": "vitest --passWithNoTests",
+    "test:seo": "vitest run src/utils/api.test.js src/utils/assets.test.js src/hooks/usePrerenderReady.test.jsx src/pages/Home/Home.test.jsx src/pages/Blog/Blog.test.jsx src/utils/seo.test.js scripts/fetch-routes.test.js scripts/generate-seo-files.test.js scripts/verify-prerender-output.test.js scripts/prepare-vercel-static-config.test.js src/pages/BlogDetail/imageTransform.test.js src/pages/Home/uptime.test.js --configLoader native",
+    "verify:prerender": "node scripts/verify-prerender-output.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
