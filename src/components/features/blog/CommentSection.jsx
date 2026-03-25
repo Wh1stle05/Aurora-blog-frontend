@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import TurnstileChallengeModal from '../../common/TurnstileChallengeModal.jsx';
 import { getComments, createComment, reactComment, deleteComment } from '../../../services/blogService';
 import styles from './CommentSection.module.css';
 import { FaUser, FaReply, FaThumbsUp, FaThumbsDown, FaTrash } from 'react-icons/fa';
@@ -19,11 +20,13 @@ const CommentItem = ({ comment, depth = 0, onReply, onReact, onDelete, currentUs
     e.preventDefault();
     if (!replyContent.trim()) return;
     setSubmitting(true);
-    await onReply(comment.id, replyContent);
-    setReplyContent('');
-    setShowReplyForm(false);
+    const submitted = await onReply(comment.id, replyContent);
+    if (submitted) {
+      setReplyContent('');
+      setShowReplyForm(false);
+      setIsExpanded(true);
+    }
     setSubmitting(false);
-    setIsExpanded(true); // expand to show new reply
   };
 
   const handleReactClick = (value) => {
@@ -139,6 +142,8 @@ export default function CommentSection({ postId }) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [currentUser, setCurrentUser] = useState(null);
+  const [showTurnstile, setShowTurnstile] = useState(false);
+  const [pendingComment, setPendingComment] = useState(null);
   const toast = useToast();
 
   useEffect(() => {
@@ -177,16 +182,21 @@ export default function CommentSection({ postId }) {
     }
   }, [comments]);
 
-  const handleMainSubmit = async (e) => {
-    e.preventDefault();
-    if (!content.trim()) return;
+  const completeCommentSubmit = async (turnstileToken) => {
+    if (!pendingComment) return;
     setSubmitting(true);
     setError('');
     try {
-      await createComment(postId, content);
-      setContent('');
+      await createComment(postId, pendingComment.content, pendingComment.parentId, turnstileToken);
+      if (pendingComment.parentId) {
+        toast.success('回复发表成功');
+      } else {
+        setContent('');
+        toast.success('评论发表成功');
+      }
+      setPendingComment(null);
+      setShowTurnstile(false);
       loadComments();
-      toast.success('评论发表成功');
     } catch (err) {
       setError(err.message || '发表评论失败');
       toast.error(err.message || '发表评论失败');
@@ -195,14 +205,26 @@ export default function CommentSection({ postId }) {
     }
   };
 
-  const handleReply = async (parentId, text) => {
-    try {
-      await createComment(postId, text, parentId);
-      loadComments();
-      toast.success('回复发表成功');
-    } catch (err) {
-      toast.error(err.message || '回复失败');
+  const requestCommentSubmit = (commentContent, parentId = null) => {
+    if (!commentContent.trim()) return false;
+    if (!currentUser) {
+      const message = '请先登录';
+      setError(message);
+      toast.error(message);
+      return false;
     }
+    setPendingComment({ content: commentContent.trim(), parentId });
+    setShowTurnstile(true);
+    return true;
+  };
+
+  const handleMainSubmit = async (e) => {
+    e.preventDefault();
+    requestCommentSubmit(content, null);
+  };
+
+  const handleReply = async (parentId, text) => {
+    return requestCommentSubmit(text, parentId);
   };
 
   const handleReact = async (commentId, value) => {
@@ -281,6 +303,14 @@ export default function CommentSection({ postId }) {
           ))
         )}
       </div>
+      <TurnstileChallengeModal
+        open={showTurnstile}
+        title="发表评论前请完成人机验证"
+        description="验证通过后会继续发布你的评论。"
+        onClose={() => { if (!submitting) { setShowTurnstile(false); setPendingComment(null); } }}
+        onVerify={completeCommentSubmit}
+        onError={(message) => toast.error(message)}
+      />
     </div>
   );
 }

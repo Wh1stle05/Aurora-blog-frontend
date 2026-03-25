@@ -178,7 +178,7 @@ function Home() {
 
         {/* 第二屏：ContentLeft 和 ContentRight 结构同步 */}
         <div className={styles.secondContainerWrapper}>
-          <PageContainer className={styles.secondContainer} style={{ maxWidth: '100%', width: '100%' }}>
+          <PageContainer className={styles.secondContainer}>
             <div className={styles.mainGrid}>
               <section className={styles.latestSection}>
                 <div className={styles.sectionHeader}>

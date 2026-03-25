@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import TurnstileChallengeModal from '../../components/common/TurnstileChallengeModal.jsx';
 import styles from './Contact.module.css';
 import PageContainer from '../../components/layout/PageContainer/PageContainer.jsx';
 import PageTitle from '../../components/layout/PageTitle/PageTitle.jsx';
@@ -14,6 +15,7 @@ import { buildDefaultMeta } from '../../utils/seo.js';
 function Contact() {
   const [form, setForm] = useState({ name: '', email: '', content: '' });
   const [status, setStatus] = useState(null);
+  const [showTurnstile, setShowTurnstile] = useState(false);
   const toast = useToast();
   const meta = buildDefaultMeta({
     title: '联系 | Aurora Blog',
@@ -23,10 +25,8 @@ function Contact() {
 
   usePrerenderReady(true);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const submitContact = async (turnstileToken) => {
     setStatus('sending');
-
     try {
       const res = await fetch(apiUrl('/api/contact'), {
         method: 'POST',
@@ -36,15 +36,16 @@ function Contact() {
         body: JSON.stringify({
           nickname: form.name,
           email: form.email,
-          content: form.content
+          content: form.content,
+          turnstile_token: turnstileToken,
         })
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         throw new Error(data.detail || '消息发送失败');
       }
-
       setStatus('success');
+      setShowTurnstile(false);
       toast.success('消息已发送！我会尽快回复你。');
       setForm({ name: '', email: '', content: '' });
     } catch (error) {
@@ -56,6 +57,11 @@ function Contact() {
     setTimeout(() => {
       setStatus(null);
     }, 1500);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setShowTurnstile(true);
   };
 
   return (
@@ -142,12 +148,19 @@ function Contact() {
                     </>
                   )}
                 </button>
-                {status === 'success' && <p className={styles.successMsg}>消息已发送！我会尽快回复你。</p>}
               </form>
             </div>
           </div>
         </PageContainer>
       </Body>
+      <TurnstileChallengeModal
+        open={showTurnstile}
+        title="发送前请完成人机验证"
+        description="验证通过后会立即发送你的消息。"
+        onClose={() => { if (status !== 'sending') setShowTurnstile(false); }}
+        onVerify={submitContact}
+        onError={(message) => toast.error(message)}
+      />
     </PageWrapper>
   );
 }
