@@ -1,5 +1,12 @@
 import { apiUrl } from '../utils/api.js';
 
+export const AUTH_EXPIRED_EVENT = 'aurora:auth-expired';
+
+function notifyAuthExpired() {
+  if (typeof window === 'undefined') return;
+  window.dispatchEvent(new CustomEvent(AUTH_EXPIRED_EVENT));
+}
+
 // 基础 fetch 封装，自动携带凭证
 const apiFetch = async (url, options = {}) => {
   const token = localStorage.getItem('access_token');
@@ -21,14 +28,12 @@ const apiFetch = async (url, options = {}) => {
 
   const response = await fetch(url, mergedOptions);
   
-  // 统一拦截 401 未授权错误
   if (response.status === 401) {
-    // 这里我们可以发送一个自定义事件，或者通过 AuthContext 处理
-    // 简单起见，清除本地存储并让页面感知
     localStorage.removeItem('user');
-    if (!url.includes('/auth/me')) {
-       // 如果不是在 checkAuth 时报错，可以考虑提示用户
-       console.warn("Session expired or unauthorized");
+    localStorage.removeItem('access_token');
+    if (!String(url).includes('/auth/me')) {
+      notifyAuthExpired();
+      console.warn('Session expired or unauthorized');
     }
   }
   
