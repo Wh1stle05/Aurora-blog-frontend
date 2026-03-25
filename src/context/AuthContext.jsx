@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useToast } from './useToast.js';
 import { AuthContext } from './AuthContextBase.js';
 import { apiUrl } from '../utils/api.js';
+import { AUTH_EXPIRED_EVENT } from '../services/blogService.js';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -40,6 +41,22 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  useEffect(() => {
+    let notified = false;
+    const handleAuthExpired = () => {
+      localStorage.removeItem('user');
+      localStorage.removeItem('access_token');
+      setUser(null);
+      if (!notified) {
+        toast.info('登录已过期，请重新登录');
+        notified = true;
+      }
+    };
+
+    window.addEventListener(AUTH_EXPIRED_EVENT, handleAuthExpired);
+    return () => window.removeEventListener(AUTH_EXPIRED_EVENT, handleAuthExpired);
+  }, [toast]);
 
   const login = (userData) => {
     setUser(userData);
