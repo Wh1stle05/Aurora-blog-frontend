@@ -46,5 +46,11 @@ jobs:
       - name: Verify prerender output
         run: npm run verify:prerender
 
-      - name: Deploy dist to Vercel
-        run: npx vercel deploy dist --prod --yes --token "$VERCEL_TOKEN"
+      - name: Pull Vercel project settings
+        run: npx vercel pull --yes --environment=production --token "$VERCEL_TOKEN"
+
+      - name: Build Vercel prebuilt output locally
+        run: npx vercel build --prod --token "$VERCEL_TOKEN"
+
+      - name: Deploy prebuilt output to Vercel
+        run: npx vercel deploy --prebuilt --prod --yes --token "$VERCEL_TOKEN"
