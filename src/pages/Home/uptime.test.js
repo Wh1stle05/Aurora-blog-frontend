@@ -1,8 +1,16 @@
 import { describe, expect, it } from "vitest";
 
-import { formatUptimeDays } from "./uptime";
+import { formatUptimeDays, resolveLaunchDayUtcMs } from "./uptime";
 
 describe("formatUptimeDays", () => {
+  it("uses the configured launch day string when present", () => {
+    expect(resolveLaunchDayUtcMs("2026-03-22")).toBe(new Date("2026-03-22T00:00:00+08:00").getTime());
+  });
+
+  it("falls back to the default launch day when config is invalid", () => {
+    expect(resolveLaunchDayUtcMs("invalid-date")).toBe(new Date("2026-03-22T00:00:00+08:00").getTime());
+  });
+
   it("returns 1d on the launch day", () => {
     expect(formatUptimeDays(new Date("2026-03-22T08:00:00+08:00"))).toBe("1d");
   });
