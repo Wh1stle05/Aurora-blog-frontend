@@ -7,6 +7,7 @@ import PageWrapper from '../../components/layout/PageWrapper/PageWrapper.jsx';
 import { getPosts, getStats } from '../../services/blogService.js';
 import { formatUptimeDays } from './uptime.js';
 import { motion } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
 import { 
   FaCode, FaRocket, FaChartLine, 
   FaReact, FaPython, FaDocker, FaDatabase, 
@@ -15,6 +16,8 @@ import {
 import { 
   SiFastapi, SiPostgresql, SiVite, SiTypescript 
 } from 'react-icons/si';
+import { usePrerenderReady } from '../../hooks/usePrerenderReady.js';
+import { buildDefaultMeta, buildPostPath } from '../../utils/seo.js';
 
 const TechIcon = ({ icon: Icon, name, color }) => (
   <div className={styles.techIconItem}>
@@ -98,9 +101,30 @@ function Home() {
 
   const postsState = postsError ? "error" : (loading ? "loading" : "ready");
   const uptimeDays = formatUptimeDays();
+  const meta = buildDefaultMeta({
+    title: 'Aurora Blog',
+    description: '一个充满科技感的个人博客系统，记录技术与生活的每一个瞬间。',
+    path: '/',
+  });
+
+  usePrerenderReady(!loading);
 
   return (
     <PageWrapper>
+      <Helmet>
+        <title>{meta.title}</title>
+        <meta name="description" content={meta.description} />
+        <link rel="canonical" href={meta.canonical} />
+        <meta property="og:type" content={meta.type} />
+        <meta property="og:title" content={meta.title} />
+        <meta property="og:description" content={meta.description} />
+        <meta property="og:url" content={meta.canonical} />
+        <meta property="og:image" content={meta.imageUrl} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={meta.title} />
+        <meta name="twitter:description" content={meta.description} />
+        <meta name="twitter:image" content={meta.imageUrl} />
+      </Helmet>
       <Body>
         {/* 第一屏：Hero Section */}
         <div className={styles.heroSection}>
@@ -175,7 +199,7 @@ function Home() {
                         viewport={{ once: true, margin: "-80% 0px 0px 0px" }}
                         transition={{ delay: idx * 0.1 }}
                       >
-                        <Link to={`/blog/${post.id}`} className={`glass blur ${styles.homeBlogCard}`}>
+                        <Link to={buildPostPath(post)} className={`glass blur ${styles.homeBlogCard}`}>
                           <div className={styles.postCardContent}>
                             <h3 className={styles.postTitle}>{post.title}</h3>
                             <p className={styles.postExcerpt}>{post.summary}</p>

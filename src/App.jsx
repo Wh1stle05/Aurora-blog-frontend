@@ -40,6 +40,19 @@ const pageVariants = {
 };
 
 const PageTransitionWrapper = ({ children, location }) => {
+  const isPrerenderMode = typeof window !== 'undefined'
+    && window.__AURORA_PRERENDER__?.proxyApi;
+
+  if (isPrerenderMode) {
+    return (
+      <Suspense fallback={<PageLoader />}>
+        <Routes location={location}>
+          {children}
+        </Routes>
+      </Suspense>
+    );
+  }
+
   return (
     <AnimatePresence 
       mode="wait" 
@@ -103,7 +116,7 @@ function AppContent() {
         <PageTransitionWrapper location={location}>
           <Route path="/" element={<Home />} />
           <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:id" element={<BlogDetail />} />
+          <Route path="/blog/:slug" element={<BlogDetail />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/profile" element={<Profile user={user} onUserUpdate={setUser} />} />

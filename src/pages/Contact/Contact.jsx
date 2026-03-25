@@ -7,11 +7,21 @@ import PageWrapper from '../../components/layout/PageWrapper/PageWrapper.jsx';
 import { FaPaperPlane, FaGithub, FaEnvelope } from 'react-icons/fa';
 import { useToast } from '../../context/useToast.js';
 import { apiUrl } from '../../utils/api.js';
+import { Helmet } from 'react-helmet-async';
+import { usePrerenderReady } from '../../hooks/usePrerenderReady.js';
+import { buildDefaultMeta } from '../../utils/seo.js';
 
 function Contact() {
   const [form, setForm] = useState({ name: '', email: '', content: '' });
   const [status, setStatus] = useState(null);
   const toast = useToast();
+  const meta = buildDefaultMeta({
+    title: '联系 | Aurora Blog',
+    description: '通过邮箱或表单与 Aurora Blog 作者联系。',
+    path: '/contact',
+  });
+
+  usePrerenderReady(true);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -50,6 +60,20 @@ function Contact() {
 
   return (
     <PageWrapper>
+      <Helmet>
+        <title>{meta.title}</title>
+        <meta name="description" content={meta.description} />
+        <link rel="canonical" href={meta.canonical} />
+        <meta property="og:type" content={meta.type} />
+        <meta property="og:title" content={meta.title} />
+        <meta property="og:description" content={meta.description} />
+        <meta property="og:url" content={meta.canonical} />
+        <meta property="og:image" content={meta.imageUrl} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={meta.title} />
+        <meta name="twitter:description" content={meta.description} />
+        <meta name="twitter:image" content={meta.imageUrl} />
+      </Helmet>
       <Body>
         <PageContainer>
           <PageTitle>联系</PageTitle>

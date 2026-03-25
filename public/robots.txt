@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://aurorablog.me/sitemap.xml
